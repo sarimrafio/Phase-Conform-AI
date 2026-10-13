@@ -31,7 +31,5 @@ services:
       - key: GEMINI_API_KEY
         sync: false # Set securely in Render dashboard
       - key: NEXT_PUBLIC_BACKEND_URL
-        fromService:
-          type: web
-          name: phase-conform-backend
-          property: host
+        value: https://phase-conform-backend.onrender.com
+

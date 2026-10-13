@@ -66,8 +66,18 @@ export default function Notebook2DModal({
     }
     // Fetch from backend /api/2d_structure
     setIsLoadingSvg(true);
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
-    fetch(`${backendUrl}/api/2d_structure`, {
+    const getBackendUrl = () => {
+      if (process.env.NEXT_PUBLIC_BACKEND_URL) {
+        const raw = process.env.NEXT_PUBLIC_BACKEND_URL.trim();
+        if (raw.startsWith('http://') || raw.startsWith('https://')) return raw;
+        return `https://${raw}`;
+      }
+      if (typeof window !== 'undefined' && window.location.hostname.includes('render.com')) {
+        return 'https://phase-conform-backend.onrender.com';
+      }
+      return 'http://localhost:8000';
+    };
+    fetch(`${getBackendUrl()}/api/2d_structure`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ smiles: moleculeData.smiles, width: 440, height: 320 })

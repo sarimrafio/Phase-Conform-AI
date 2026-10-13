@@ -14,7 +14,18 @@ const KetcherDrawer = dynamic(() => import('../components/KetcherDrawer'), { ssr
 const Notebook2DModal = dynamic(() => import('../components/Notebook2DModal'), { ssr: false });
 
 const R = 0.008314; 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
+const getBackendUrl = () => {
+  if (process.env.NEXT_PUBLIC_BACKEND_URL) {
+    const raw = process.env.NEXT_PUBLIC_BACKEND_URL.trim();
+    if (raw.startsWith('http://') || raw.startsWith('https://')) return raw;
+    return `https://${raw}`;
+  }
+  if (typeof window !== 'undefined' && window.location.hostname.includes('render.com')) {
+    return 'https://phase-conform-backend.onrender.com';
+  }
+  return 'http://localhost:8000';
+};
+
 
 // --- Dynamic 3D Chemistry Components ---
 
@@ -931,7 +942,7 @@ export default function PhaseConformDashboard() {
     if (!moleculeData) return;
     try {
       setIsLoading(true);
-      const res = await fetch(`${BACKEND_URL}/api/invert_stereo`, {
+      const res = await fetch(`${getBackendUrl()}/api/invert_stereo`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ smiles: moleculeData.smiles, atom_index: atomIdx })
@@ -1085,7 +1096,7 @@ export default function PhaseConformDashboard() {
 
       // 1. Try Live RDKit Backend
       try {
-        const res = await fetch(`${BACKEND_URL}/api/analyze`, {
+        const res = await fetch(`${getBackendUrl()}/api/analyze`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
