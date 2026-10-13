@@ -1,0 +1,50 @@
+# Dependencies
+node_modules/
+backend/venv/
+training_env/
+.pnp
+.pnp.js
+
+# Next.js build output
+.next/
+out/
+build/
+dist/
+
+# Environment Variables & Secrets (CRITICAL)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Python cache & artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing & Models
+models/
+*.onnx.data
+check_cuda_wheels.py
+test*.py
+train*.py
+
+# OS Files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,643 @@
+{
+  "atoms": [
+    {
+      "index": 0,
+      "element": "C",
+      "x": 1.2298159853934785,
+      "y": -0.10082110078281195,
+      "z": -0.3349763570682693,
+      "stereo": "",
+      "hybridization": 0.75,
+      "valence": 0.6666666666666666,
+      "charge": -0.0656
+    },
+    {
+      "index": 1,
+      "element": "C",
+      "x": 0.019820480033009513,
+      "y": -0.23079811925891772,
+      "z": 0.574631966466991,
+      "stereo": "",
+      "hybridization": 0.75,
+      "valence": 0.6666666666666666,
+      "charge": -0.059
+    },
+    {
+      "index": 2,
+      "element": "C",
+      "x": -1.0456215107672737,
+      "y": -1.1267359173179734,
+      "z": -0.03405308871984286,
+      "stereo": "",
+      "hybridization": 0.75,
+      "valence": 0.6666666666666666,
+      "charge": -0.0656
+    },
+    {
+      "index": 3,
+      "element": "H",
+      "x": 1.4025172341503178,
+      "y": 0.944289990379818,
+      "z": -0.611245908146939,
+      "stereo": "",
+      "hybridization": 0.25,
+      "valence": 0.16666666666666666,
+      "charge": 0.023
+    },
+    {
+      "index": 4,
+      "element": "H",
+      "x": 2.1266327001128222,
+      "y": -0.4709886381551385,
+      "z": 0.1715737391925394,
+      "stereo": "",
+      "hybridization": 0.25,
+      "valence": 0.16666666666666666,
+      "charge": 0.023
+    },
+    {
+      "index": 5,
+      "element": "H",
+      "x": 1.094375657567118,
+      "y": -0.6809792424455029,
+      "z": -1.2533888357041565,
+      "stereo": "",
+      "hybridization": 0.25,
+      "valence": 0.16666666666666666,
+      "charge": 0.023
+    },
+    {
+      "index": 6,
+      "element": "H",
+      "x": 0.33255043679090046,
+      "y": -0.640876383893716,
+      "z": 1.541299059075604,
+      "stereo": "",
+      "hybridization": 0.25,
+      "valence": 0.16666666666666666,
+      "charge": 0.0261
+    },
+    {
+      "index": 7,
+      "element": "H",
+      "x": -0.4029206380546204,
+      "y": 0.7622035683225902,
+      "z": 0.7634346824581224,
+      "stereo": "",
+      "hybridization": 0.25,
+      "valence": 0.16666666666666666,
+      "charge": 0.0261
+    },
+    {
+      "index": 8,
+      "element": "H",
+      "x": -1.9054381860918548,
+      "y": -1.2044906766644956,
+      "z": 0.638677660596713,
+      "stereo": "",
+      "hybridization": 0.25,
+      "valence": 0.16666666666666666,
+      "charge": 0.023
+    },
+    {
+      "index": 9,
+      "element": "H",
+      "x": -0.6576218125770403,
+      "y": -2.1355667168862724,
+      "z": -0.20762230311463675,
+      "stereo": "",
+      "hybridization": 0.25,
+      "valence": 0.16666666666666666,
+      "charge": 0.023
+    },
+    {
+      "index": 10,
+      "element": "H",
+      "x": -1.397126463302065,
+      "y": -0.7248028334248082,
+      "z": -0.9897223352340052,
+      "stereo": "",
+      "hybridization": 0.25,
+      "valence": 0.16666666666666666,
+      "charge": 0.023
+    }
+  ],
+  "bonds": [
+    {
+      "start": 0,
+      "end": 1,
+      "type": 1.0
+    },
+    {
+      "start": 1,
+      "end": 2,
+      "type": 1.0
+    },
+    {
+      "start": 0,
+      "end": 3,
+      "type": 1.0
+    },
+    {
+      "start": 0,
+      "end": 4,
+      "type": 1.0
+    },
+    {
+      "start": 0,
+      "end": 5,
+      "type": 1.0
+    },
+    {
+      "start": 1,
+      "end": 6,
+      "type": 1.0
+    },
+    {
+      "start": 1,
+      "end": 7,
+      "type": 1.0
+    },
+    {
+      "start": 2,
+      "end": 8,
+      "type": 1.0
+    },
+    {
+      "start": 2,
+      "end": 9,
+      "type": 1.0
+    },
+    {
+      "start": 2,
+      "end": 10,
+      "type": 1.0
+    }
+  ],
+  "energies": [
+    {
+      "angle": 0,
+      "energy": 14.262,
+      "energy_kcal": 3.409,
+      "energy_kj": 14.262
+    },
+    {
+      "angle": 5,
+      "energy": 14.022,
+      "energy_kcal": 3.351,
+      "energy_kj": 14.022
+    },
+    {
+      "angle": 10,
+      "energy": 13.321,
+      "energy_kcal": 3.184,
+      "energy_kj": 13.321
+    },
+    {
+      "angle": 15,
+      "energy": 12.204,
+      "energy_kcal": 2.917,
+      "energy_kj": 12.204
+    },
+    {
+      "angle": 20,
+      "energy": 10.294,
+      "energy_kcal": 2.46,
+      "energy_kj": 10.294
+    },
+    {
+      "angle": 25,
+      "energy": 8.516,
+      "energy_kcal": 2.035,
+      "energy_kj": 8.516
+    },
+    {
+      "angle": 30,
+      "energy": 6.684,
+      "energy_kcal": 1.598,
+      "energy_kj": 6.684
+    },
+    {
+      "angle": 35,
+      "energy": 4.925,
+      "energy_kcal": 1.177,
+      "energy_kj": 4.925
+    },
+    {
+      "angle": 40,
+      "energy": 3.361,
+      "energy_kcal": 0.803,
+      "energy_kj": 3.361
+    },
+    {
+      "angle": 45,
+      "energy": 2.102,
+      "energy_kcal": 0.502,
+      "energy_kj": 2.102
+    },
+    {
+      "angle": 50,
+      "energy": 1.238,
+      "energy_kcal": 0.296,
+      "energy_kj": 1.238
+    },
+    {
+      "angle": 55,
+      "energy": 0.832,
+      "energy_kcal": 0.199,
+      "energy_kj": 0.832
+    },
+    {
+      "angle": 60,
+      "energy": 0.0,
+      "energy_kcal": 0.0,
+      "energy_kj": 0.0
+    },
+    {
+      "angle": 65,
+      "energy": 0.193,
+      "energy_kcal": 0.046,
+      "energy_kj": 0.193
+    },
+    {
+      "angle": 70,
+      "energy": 0.837,
+      "energy_kcal": 0.2,
+      "energy_kj": 0.837
+    },
+    {
+      "angle": 75,
+      "energy": 1.798,
+      "energy_kcal": 0.43,
+      "energy_kj": 1.798
+    },
+    {
+      "angle": 80,
+      "energy": 3.151,
+      "energy_kcal": 0.753,
+      "energy_kj": 3.151
+    },
+    {
+      "angle": 85,
+      "energy": 4.795,
+      "energy_kcal": 1.146,
+      "energy_kj": 4.795
+    },
+    {
+      "angle": 90,
+      "energy": 6.618,
+      "energy_kcal": 1.582,
+      "energy_kj": 6.618
+    },
+    {
+      "angle": 95,
+      "energy": 8.494,
+      "energy_kcal": 2.03,
+      "energy_kj": 8.494
+    },
+    {
+      "angle": 100,
+      "energy": 10.108,
+      "energy_kcal": 2.416,
+      "energy_kj": 10.108
+    },
+    {
+      "angle": 105,
+      "energy": 11.723,
+      "energy_kcal": 2.802,
+      "energy_kj": 11.723
+    },
+    {
+      "angle": 110,
+      "energy": 13.062,
+      "energy_kcal": 3.122,
+      "energy_kj": 13.062
+    },
+    {
+      "angle": 115,
+      "energy": 14.033,
+      "energy_kcal": 3.354,
+      "energy_kj": 14.033
+    },
+    {
+      "angle": 120,
+      "energy": 14.255,
+      "energy_kcal": 3.407,
+      "energy_kj": 14.255
+    },
+    {
+      "angle": 125,
+      "energy": 14.061,
+      "energy_kcal": 3.361,
+      "energy_kj": 14.061
+    },
+    {
+      "angle": 130,
+      "energy": 13.325,
+      "energy_kcal": 3.185,
+      "energy_kj": 13.325
+    },
+    {
+      "angle": 135,
+      "energy": 12.144,
+      "energy_kcal": 2.902,
+      "energy_kj": 12.144
+    },
+    {
+      "angle": 140,
+      "energy": 10.548,
+      "energy_kcal": 2.521,
+      "energy_kj": 10.548
+    },
+    {
+      "angle": 145,
+      "energy": 8.753,
+      "energy_kcal": 2.092,
+      "energy_kj": 8.753
+    },
+    {
+      "angle": 150,
+      "energy": 6.871,
+      "energy_kcal": 1.642,
+      "energy_kj": 6.871
+    },
+    {
+      "angle": 155,
+      "energy": 5.034,
+      "energy_kcal": 1.203,
+      "energy_kj": 5.034
+    },
+    {
+      "angle": 160,
+      "energy": 3.361,
+      "energy_kcal": 0.803,
+      "energy_kj": 3.361
+    },
+    {
+      "angle": 165,
+      "energy": 1.951,
+      "energy_kcal": 0.466,
+      "energy_kj": 1.951
+    },
+    {
+      "angle": 170,
+      "energy": 0.887,
+      "energy_kcal": 0.212,
+      "energy_kj": 0.887
+    },
+    {
+      "angle": 175,
+      "energy": 0.224,
+      "energy_kcal": 0.054,
+      "energy_kj": 0.224
+    },
+    {
+      "angle": 180,
+      "energy": 0.025,
+      "energy_kcal": 0.006,
+      "energy_kj": 0.025
+    },
+    {
+      "angle": 185,
+      "energy": 0.327,
+      "energy_kcal": 0.078,
+      "energy_kj": 0.327
+    },
+    {
+      "angle": 190,
+      "energy": 0.887,
+      "energy_kcal": 0.212,
+      "energy_kj": 0.887
+    },
+    {
+      "angle": 195,
+      "energy": 1.951,
+      "energy_kcal": 0.466,
+      "energy_kj": 1.951
+    },
+    {
+      "angle": 200,
+      "energy": 3.361,
+      "energy_kcal": 0.803,
+      "energy_kj": 3.361
+    },
+    {
+      "angle": 205,
+      "energy": 5.034,
+      "energy_kcal": 1.203,
+      "energy_kj": 5.034
+    },
+    {
+      "angle": 210,
+      "energy": 6.871,
+      "energy_kcal": 1.642,
+      "energy_kj": 6.871
+    },
+    {
+      "angle": 215,
+      "energy": 8.753,
+      "energy_kcal": 2.092,
+      "energy_kj": 8.753
+    },
+    {
+      "angle": 220,
+      "energy": 10.548,
+      "energy_kcal": 2.521,
+      "energy_kj": 10.548
+    },
+    {
+      "angle": 225,
+      "energy": 12.116,
+      "energy_kcal": 2.896,
+      "energy_kj": 12.116
+    },
+    {
+      "angle": 230,
+      "energy": 13.325,
+      "energy_kcal": 3.185,
+      "energy_kj": 13.325
+    },
+    {
+      "angle": 235,
+      "energy": 14.097,
+      "energy_kcal": 3.369,
+      "energy_kj": 14.097
+    },
+    {
+      "angle": 240,
+      "energy": 14.255,
+      "energy_kcal": 3.407,
+      "energy_kj": 14.255
+    },
+    {
+      "angle": 245,
+      "energy": 13.93,
+      "energy_kcal": 3.329,
+      "energy_kj": 13.93
+    },
+    {
+      "angle": 250,
+      "energy": 13.15,
+      "energy_kcal": 3.143,
+      "energy_kj": 13.15
+    },
+    {
+      "angle": 255,
+      "energy": 11.966,
+      "energy_kcal": 2.86,
+      "energy_kj": 11.966
+    },
+    {
+      "angle": 260,
+      "energy": 10.108,
+      "energy_kcal": 2.416,
+      "energy_kj": 10.108
+    },
+    {
+      "angle": 265,
+      "energy": 8.326,
+      "energy_kcal": 1.99,
+      "energy_kj": 8.326
+    },
+    {
+      "angle": 270,
+      "energy": 6.501,
+      "energy_kcal": 1.554,
+      "energy_kj": 6.501
+    },
+    {
+      "angle": 275,
+      "energy": 4.759,
+      "energy_kcal": 1.137,
+      "energy_kj": 4.759
+    },
+    {
+      "angle": 280,
+      "energy": 3.22,
+      "energy_kcal": 0.77,
+      "energy_kj": 3.22
+    },
+    {
+      "angle": 285,
+      "energy": 1.991,
+      "energy_kcal": 0.476,
+      "energy_kj": 1.991
+    },
+    {
+      "angle": 290,
+      "energy": 0.803,
+      "energy_kcal": 0.192,
+      "energy_kj": 0.803
+    },
+    {
+      "angle": 295,
+      "energy": 0.227,
+      "energy_kcal": 0.054,
+      "energy_kj": 0.227
+    },
+    {
+      "angle": 300,
+      "energy": 0.142,
+      "energy_kcal": 0.034,
+      "energy_kj": 0.142
+    },
+    {
+      "angle": 305,
+      "energy": 0.234,
+      "energy_kcal": 0.056,
+      "energy_kj": 0.234
+    },
+    {
+      "angle": 310,
+      "energy": 0.918,
+      "energy_kcal": 0.219,
+      "energy_kj": 0.918
+    },
+    {
+      "angle": 315,
+      "energy": 1.915,
+      "energy_kcal": 0.458,
+      "energy_kj": 1.915
+    },
+    {
+      "angle": 320,
+      "energy": 3.297,
+      "energy_kcal": 0.788,
+      "energy_kj": 3.297
+    },
+    {
+      "angle": 325,
+      "energy": 4.965,
+      "energy_kcal": 1.187,
+      "energy_kj": 4.965
+    },
+    {
+      "angle": 330,
+      "energy": 6.801,
+      "energy_kcal": 1.625,
+      "energy_kj": 6.801
+    },
+    {
+      "angle": 335,
+      "energy": 8.679,
+      "energy_kcal": 2.074,
+      "energy_kj": 8.679
+    },
+    {
+      "angle": 340,
+      "energy": 10.47,
+      "energy_kcal": 2.502,
+      "energy_kj": 10.47
+    },
+    {
+      "angle": 345,
+      "energy": 12.053,
+      "energy_kcal": 2.881,
+      "energy_kj": 12.053
+    },
+    {
+      "angle": 350,
+      "energy": 13.319,
+      "energy_kcal": 3.183,
+      "energy_kj": 13.319
+    },
+    {
+      "angle": 355,
+      "energy": 14.183,
+      "energy_kcal": 3.39,
+      "energy_kj": 14.183
+    },
+    {
+      "angle": 360,
+      "energy": 14.586,
+      "energy_kcal": 3.486,
+      "energy_kj": 14.586
+    }
+  ],
+  "rotatable_bonds": [
+    {
+      "a2": 0,
+      "a3": 1
+    },
+    {
+      "a2": 1,
+      "a3": 2
+    }
+  ],
+  "active_bond": {
+    "a2": 0,
+    "a3": 1
+  },
+  "rotatable_bond": {
+    "a2": 0,
+    "a3": 1
+  },
+  "dihedral_indices": [
+    5,
+    0,
+    1,
+    2
+  ],
+  "scan_mode": "relaxed_adiabatic",
+  "message": "Success"
+}
