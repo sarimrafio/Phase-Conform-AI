@@ -1507,15 +1507,15 @@ export default function PhaseConformDashboard() {
     >
       
       {/* Header - Compact Glass Panel */}
-      <header className="mb-3 flex flex-col md:flex-row justify-between items-center gap-3 theme-panel backdrop-blur-xl px-4 py-2.5 rounded-2xl border shadow-lg shrink-0 relative z-40">
-        <div className="flex items-center gap-3 flex-wrap">
-           <h1 className={`text-2xl font-bold bg-gradient-to-r ${isDarkMode ? 'from-indigo-300 via-purple-300 to-pink-300' : 'from-indigo-600 via-purple-600 to-pink-600'} bg-clip-text text-transparent flex items-center gap-2 drop-shadow-sm`}>
-             <Hexagon className={`w-7 h-7 ${isDarkMode ? 'text-indigo-300' : 'text-indigo-600'}`} />
+      <header className="mb-3 flex flex-col md:flex-row justify-between items-center gap-2.5 sm:gap-3 theme-panel backdrop-blur-xl px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl border shadow-lg shrink-0 relative z-40">
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-between w-full md:w-auto">
+           <h1 className={`text-xl sm:text-2xl font-bold bg-gradient-to-r ${isDarkMode ? 'from-indigo-300 via-purple-300 to-pink-300' : 'from-indigo-600 via-purple-600 to-pink-600'} bg-clip-text text-transparent flex items-center gap-2 drop-shadow-sm`}>
+             <Hexagon className={`w-6 h-6 sm:w-7 sm:h-7 ${isDarkMode ? 'text-indigo-300' : 'text-indigo-600'}`} />
              Phase-Conform AI
            </h1>
-           <div className="flex items-center gap-2 flex-wrap">
+           <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
              {formulaParts.length > 0 && (
-               <span className="text-xs theme-card theme-border px-2.5 py-0.5 rounded-full font-mono flex items-center gap-1 font-bold shadow-inner">
+               <span className="text-xs theme-card theme-border px-2 sm:px-2.5 py-0.5 rounded-full font-mono flex items-center gap-1 font-bold shadow-inner">
                  <span className="text-[10px] theme-text-muted uppercase mr-0.5">Formula:</span>
                  {formulaParts.map((p, idx) => (
                    <span key={idx} className="font-bold theme-text-main">
@@ -1525,18 +1525,18 @@ export default function PhaseConformDashboard() {
                  ))}
                </span>
              )}
-             <span className={`text-[11px] ${isDarkMode ? 'bg-pink-500/10 text-pink-400 border-pink-500/20' : 'bg-pink-50 text-pink-600 border-pink-200'} border px-2 py-0.5 rounded-full font-mono uppercase flex items-center gap-1 font-bold`}>
+             <span className={`text-[10px] sm:text-[11px] ${isDarkMode ? 'bg-pink-500/10 text-pink-400 border-pink-500/20' : 'bg-pink-50 text-pink-600 border-pink-200'} border px-2 py-0.5 rounded-full font-mono uppercase flex items-center gap-1 font-bold`}>
                <Zap className={`w-3 h-3 ${isDarkMode ? 'text-pink-400' : 'text-pink-600'}`} /> ONNX Active
              </span>
              {isOffline && (
-               <span className={`text-[11px] ${isDarkMode ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-amber-50 text-amber-700 border-amber-200'} border px-2 py-0.5 rounded-full font-mono uppercase font-bold`}>
+               <span className={`text-[10px] sm:text-[11px] ${isDarkMode ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-amber-50 text-amber-700 border-amber-200'} border px-2 py-0.5 rounded-full font-mono uppercase font-bold`}>
                  Offline Cache
                </span>
              )}
            </div>
         </div>
         
-        <div className="flex items-center gap-2 w-full md:w-auto justify-end flex-wrap">
+        <div className="flex items-center gap-1.5 sm:gap-2 w-full md:w-auto justify-end flex-wrap">
           {/* 10 Popular Color Palettes Selector */}
           <div className="relative" ref={themePickerRef}>
             <button 
@@ -1624,32 +1624,38 @@ export default function PhaseConformDashboard() {
           </button>
 
           {/* Option to Write Chemical Formula / Name / SMILES */}
-          <div className="flex items-center gap-1.5 theme-sub p-1 rounded-lg border theme-border">
+          <div className="flex items-center gap-1.5 theme-sub p-1 rounded-lg border theme-border flex-1 sm:flex-initial min-w-[140px]">
             <input 
               type="text" 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && searchCompound(searchQuery)}
               placeholder="Formula (C4H10) or compound..."
-              className="bg-transparent theme-text-primary text-xs px-2 py-1 rounded outline-none w-40 sm:w-52 placeholder-indigo-300/40"
+              className="bg-transparent theme-text-primary text-xs px-2 py-1 rounded outline-none w-28 xs:w-36 sm:w-52 placeholder-indigo-300/40 flex-1 sm:flex-initial"
             />
             <button 
               onClick={() => searchCompound(searchQuery)}
               disabled={isSearching}
-              className="bg-gradient-to-r from-indigo-500 to-pink-500 hover:from-indigo-400 hover:to-pink-400 text-white font-bold px-2.5 py-1 rounded text-xs transition-colors flex items-center gap-1"
+              className="bg-gradient-to-r from-indigo-500 to-pink-500 hover:from-indigo-400 hover:to-pink-400 text-white font-bold px-2.5 py-1 rounded text-xs transition-colors flex items-center gap-1 shrink-0"
               title="Load Chemical Formula or Compound"
             >
               {isSearching ? '...' : 'Load'}
             </button>
           </div>
 
-          <button onClick={loadRandomCompound} className="text-xs font-bold theme-sub hover:opacity-80 theme-border border px-2 py-1.5 rounded-lg transition-all text-center uppercase tracking-wider shrink-0 hidden lg:inline-block">
-            🎲
+          {/* Random Molecule Generator Button - prominently accessible on all devices */}
+          <button 
+            onClick={loadRandomCompound} 
+            className="text-xs font-bold theme-sub hover:opacity-80 theme-border border px-2.5 py-1.5 rounded-lg transition-all text-center uppercase tracking-wider shrink-0 flex items-center gap-1.5 shadow-sm active:scale-95"
+            title="Generate Random Molecule (Alkane, Cycloalkane, Bioactive, Chiral)"
+          >
+            <span className="text-sm">🎲</span>
+            <span className="hidden sm:inline">Random</span>
           </button>
 
           <button 
             onClick={() => setChatOpen(prev => !prev)}
-            className={`text-xs font-bold border px-3 py-1.5 rounded-lg transition-all text-center flex items-center gap-1.5 shrink-0 ${
+            className={`text-xs font-bold border px-2.5 sm:px-3 py-1.5 rounded-lg transition-all text-center flex items-center gap-1.5 shrink-0 active:scale-95 ${
               chatOpen 
                 ? 'bg-pink-500 text-white border-pink-400 shadow-[0_0_15px_rgba(244,114,182,0.4)]' 
                 : 'bg-gradient-to-r from-pink-500/20 to-purple-500/20 hover:from-pink-500/30 hover:to-purple-500/30 text-pink-400 border-pink-500/30'
@@ -1657,7 +1663,7 @@ export default function PhaseConformDashboard() {
             title="Toggle Gemini AI Co-Pilot Assistant"
           >
             <Zap className="w-3.5 h-3.5 text-pink-400 animate-pulse" />
-            Gemini
+            <span className="hidden xs:inline">Gemini</span>
           </button>
         </div>
       </header>
@@ -1685,7 +1691,7 @@ export default function PhaseConformDashboard() {
 
         {/* Left Column: The Reaction Canvas */}
         <section 
-          className="md:col-span-6 lg:col-span-6 relative theme-panel backdrop-blur-md rounded-2xl border theme-border overflow-hidden flex flex-col shadow-[inset_0_0_60px_rgba(0,0,0,0.15)] h-full min-h-[420px] transition-colors duration-500"
+          className="md:col-span-6 lg:col-span-6 relative theme-panel backdrop-blur-md rounded-2xl border theme-border overflow-hidden flex flex-col shadow-[inset_0_0_60px_rgba(0,0,0,0.15)] h-[440px] sm:h-[500px] md:h-full md:min-h-[420px] transition-colors duration-500"
           style={{ backgroundColor: currentTheme.canvasBg }}
         >
           <div 
@@ -1809,9 +1815,9 @@ export default function PhaseConformDashboard() {
             </div>
 
             {/* Row 3: Render Modes, Camera Presets & Cinematic Controls */}
-            <div className="flex flex-wrap items-center justify-between gap-2 pt-1.5 border-t theme-border">
+            <div className="flex flex-wrap items-center justify-between gap-1.5 sm:gap-2 pt-1.5 border-t theme-border">
               {/* Render Modes: Ball & Stick, Space-Filling, Wireframe, ESP Heatmap */}
-              <div className="flex items-center gap-1 theme-card p-0.5 rounded-lg border theme-border shadow-inner">
+              <div className="flex items-center gap-0.5 sm:gap-1 theme-card p-0.5 rounded-lg border theme-border shadow-inner overflow-x-auto max-w-full">
                 {[
                   ['ball-stick', 'Ball & Stick', 'bg-indigo-500 text-white shadow-sm'],
                   ['vdw', 'Space-Filling', 'bg-purple-500 text-white shadow-sm'],
@@ -1821,7 +1827,7 @@ export default function PhaseConformDashboard() {
                   <button
                     key={mode}
                     onClick={() => setRenderMode(mode)}
-                    className={`text-xs px-2.5 py-1 rounded-md font-bold uppercase tracking-wider transition-all border ${
+                    className={`text-[10px] sm:text-xs px-2 sm:px-2.5 py-1 rounded-md font-bold uppercase tracking-wider transition-all border shrink-0 ${
                       renderMode === mode 
                         ? `${activeClass} border-transparent` 
                         : 'theme-text-sub border-transparent hover:theme-text-main hover:opacity-80'
@@ -1833,28 +1839,28 @@ export default function PhaseConformDashboard() {
               </div>
 
               {/* Camera Angle Presets */}
-              <div className="flex flex-wrap items-center gap-1">
+              <div className="flex items-center gap-1 overflow-x-auto max-w-full shrink-0">
                 <span className="text-[10px] font-bold theme-text-muted uppercase tracking-widest mr-0.5 hidden sm:inline">Cam:</span>
-                <button onClick={() => fitModelToWindow('front')} className="text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-2 py-1 rounded-lg transition-all font-medium" title="Front Projection (Auto-fitted)">
+                <button onClick={() => fitModelToWindow('front')} className="text-[11px] sm:text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-1.5 sm:px-2 py-1 rounded-lg transition-all font-medium shrink-0" title="Front Projection (Auto-fitted)">
                   Front
                 </button>
-                <button onClick={() => fitModelToWindow('chair')} className="text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-2 py-1 rounded-lg transition-all font-medium" title="Isometric Chair View (Auto-fitted)">
+                <button onClick={() => fitModelToWindow('chair')} className="text-[11px] sm:text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-1.5 sm:px-2 py-1 rounded-lg transition-all font-medium shrink-0" title="Isometric Chair View (Auto-fitted)">
                   Iso Chair
                 </button>
-                <button onClick={() => fitModelToWindow('haworth')} className="text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-2 py-1 rounded-lg transition-all font-medium" title="Haworth Ring Projection (Auto-fitted)">
+                <button onClick={() => fitModelToWindow('haworth')} className="text-[11px] sm:text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-1.5 sm:px-2 py-1 rounded-lg transition-all font-medium shrink-0" title="Haworth Ring Projection (Auto-fitted)">
                   Haworth
                 </button>
-                <button onClick={() => fitModelToWindow('fischer')} className="text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-2 py-1 rounded-lg transition-all font-medium" title="Fischer / Newman Axial View (Auto-fitted)">
+                <button onClick={() => fitModelToWindow('fischer')} className="text-[11px] sm:text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-1.5 sm:px-2 py-1 rounded-lg transition-all font-medium shrink-0" title="Fischer / Newman Axial View (Auto-fitted)">
                   Fischer
                 </button>
               </div>
 
               {/* Cinematic Controls & Dipole Toggle */}
-              <div className="flex items-center gap-1 flex-wrap">
+              <div className="flex items-center gap-1 overflow-x-auto max-w-full shrink-0">
                 {/* 2D Notebook Structure Button */}
                 <button 
                   onClick={() => setIsNotebook2DOpen(true)} 
-                  className={`text-xs px-2.5 py-1 rounded-lg font-bold transition-all border flex items-center gap-1.5 shadow-sm ${
+                  className={`text-[11px] sm:text-xs px-2 sm:px-2.5 py-1 rounded-lg font-bold transition-all border flex items-center gap-1.5 shadow-sm shrink-0 ${
                     isDarkMode 
                       ? 'bg-purple-500/20 text-purple-300 border-purple-400/40 hover:bg-purple-500/30 hover:text-white' 
                       : 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100 hover:text-purple-900'
@@ -1868,7 +1874,7 @@ export default function PhaseConformDashboard() {
                 {/* Perfect Fit to Window Button */}
                 <button 
                   onClick={() => fitModelToWindow('current')} 
-                  className={`text-xs px-2.5 py-1 rounded-lg font-bold transition-all border flex items-center gap-1.5 shadow-sm ${
+                  className={`text-[11px] sm:text-xs px-2 sm:px-2.5 py-1 rounded-lg font-bold transition-all border flex items-center gap-1 shadow-sm shrink-0 ${
                     isDarkMode 
                       ? 'bg-indigo-500/20 text-indigo-300 border-indigo-400/40 hover:bg-indigo-500/30 hover:text-white' 
                       : 'bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 hover:text-indigo-900'
@@ -1876,30 +1882,30 @@ export default function PhaseConformDashboard() {
                   title="Fit whole 3D model perfectly within visible window (Hotkey: F)"
                 >
                   <Maximize2 className="w-3.5 h-3.5 text-indigo-500" />
-                  <span>Fit View</span>
+                  <span className="hidden sm:inline">Fit View</span>
                 </button>
-                <button onClick={handleZoomIn} className="text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-2 py-1 rounded-lg font-bold transition-all" title="Zoom In (+)">
+                <button onClick={handleZoomIn} className="text-[11px] sm:text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-1.5 sm:px-2 py-1 rounded-lg font-bold transition-all shrink-0" title="Zoom In (+)">
                   +
                 </button>
-                <button onClick={handleZoomOut} className="text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-2 py-1 rounded-lg font-bold transition-all" title="Zoom Out (-)">
+                <button onClick={handleZoomOut} className="text-[11px] sm:text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-1.5 sm:px-2 py-1 rounded-lg font-bold transition-all shrink-0" title="Zoom Out (-)">
                   -
                 </button>
                 <button 
                   onClick={() => setIsAutoRotatingMolecule(!isAutoRotatingMolecule)} 
-                  className={`text-xs px-2.5 py-1 rounded-lg transition-all font-bold border ${isAutoRotatingMolecule ? 'bg-pink-500 text-white border-pink-400 shadow-sm' : 'theme-card hover:opacity-80 theme-text-main border theme-border'}`}
+                  className={`text-[11px] sm:text-xs px-2 sm:px-2.5 py-1 rounded-lg transition-all font-bold border shrink-0 ${isAutoRotatingMolecule ? 'bg-pink-500 text-white border-pink-400 shadow-sm' : 'theme-card hover:opacity-80 theme-text-main border theme-border'}`}
                 >
                   {isAutoRotatingMolecule ? '⏹ Spin' : '▶ Spin'}
                 </button>
                 <button 
                   onClick={() => setIsAutoRotatingBond(!isAutoRotatingBond)} 
                   disabled={!moleculeData?.active_bond}
-                  className={`text-xs px-2.5 py-1 rounded-lg transition-all font-bold border ${!moleculeData?.active_bond ? 'opacity-40 cursor-not-allowed theme-card text-slate-400 border theme-border' : (isAutoRotatingBond ? 'bg-teal-500 text-white border-teal-400 shadow-sm' : 'theme-card hover:opacity-80 theme-text-main border theme-border')}`}
+                  className={`text-[11px] sm:text-xs px-2 sm:px-2.5 py-1 rounded-lg transition-all font-bold border shrink-0 ${!moleculeData?.active_bond ? 'opacity-40 cursor-not-allowed theme-card text-slate-400 border theme-border' : (isAutoRotatingBond ? 'bg-teal-500 text-white border-teal-400 shadow-sm' : 'theme-card hover:opacity-80 theme-text-main border theme-border')}`}
                 >
                   {isAutoRotatingBond ? '⏹ Bond' : '▶ Bond'}
                 </button>
                 <button 
                   onClick={() => setShowDipole(!showDipole)} 
-                  className={`text-xs px-2.5 py-1 rounded-lg transition-all font-bold border flex items-center gap-1 ${
+                  className={`text-[11px] sm:text-xs px-2 sm:px-2.5 py-1 rounded-lg transition-all font-bold border flex items-center gap-1 shrink-0 ${
                     showDipole 
                       ? (isDarkMode ? 'bg-sky-500/20 text-sky-300 border-sky-400/50 shadow-[0_0_12px_rgba(56,189,248,0.3)]' : 'bg-sky-100 text-sky-700 border-sky-300 shadow-sm font-bold') 
                       : 'theme-card hover:opacity-80 theme-text-main border theme-border'
@@ -1914,7 +1920,7 @@ export default function PhaseConformDashboard() {
           </div>
 
           {/* 3D Canvas Container */}
-          <div className="flex-1 w-full min-h-0 cursor-move z-0 relative">
+          <div className="flex-1 w-full min-h-[220px] sm:min-h-[280px] cursor-move z-0 relative touch-none">
             <Canvas camera={{ position: [0, 0, 7], fov: 50 }}>
               <CameraAnimator 
                 targetPos={cameraPos} 
@@ -1974,13 +1980,13 @@ export default function PhaseConformDashboard() {
               className={`w-full h-2.5 rounded-lg appearance-none cursor-pointer accent-pink-500 mb-2.5 ${moleculeData?.active_bond ? 'theme-sub' : 'bg-slate-300 dark:bg-slate-800 cursor-not-allowed opacity-50'}`} 
             />
             
-            <div className="flex justify-between gap-1.5 w-full">
+            <div className="flex justify-between gap-1 sm:gap-1.5 w-full">
               {[0, 60, 120, 180, 240, 300].map(snap => (
                 <button
                   key={snap}
                   onClick={() => moleculeData?.active_bond && setAngle(snap)}
                   disabled={!moleculeData?.active_bond}
-                  className={`text-xs font-mono py-1 px-1.5 rounded-lg transition-all flex-1 text-center font-bold border ${
+                  className={`text-[10px] sm:text-xs font-mono py-1 px-1 sm:px-1.5 rounded-lg transition-all flex-1 text-center font-bold border ${
                     angle === snap 
                       ? 'bg-pink-500 text-white border-pink-400 shadow-sm scale-105' 
                       : 'theme-card theme-text-main border theme-border hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed'
@@ -2385,9 +2391,9 @@ export default function PhaseConformDashboard() {
       />
 
       {/* Gemini AI Floating Assistant */}
-      <div className={`fixed bottom-6 right-6 z-[90] flex flex-col items-end transition-all duration-500 ${chatOpen ? 'w-80 h-[500px]' : 'w-14 h-14'}`}>
+      <div className={`fixed bottom-3 right-3 sm:bottom-6 sm:right-6 z-[90] flex flex-col items-end transition-all duration-500 ${chatOpen ? 'w-[calc(100vw-24px)] sm:w-80 max-w-sm h-[480px] max-h-[80vh]' : 'w-12 h-12 sm:w-14 sm:h-14'}`}>
         {/* Chat Window */}
-        <div className={`w-full h-full theme-panel backdrop-blur-xl border border-pink-500/30 rounded-2xl shadow-[0_0_40px_rgba(244,114,182,0.15)] flex flex-col overflow-hidden transition-all duration-500 origin-bottom-right ${chatOpen ? 'scale-100 opacity-100 mb-4' : 'scale-0 opacity-0 absolute bottom-0 right-0 pointer-events-none'}`}>
+        <div className={`w-full h-full theme-panel backdrop-blur-xl border border-pink-500/30 rounded-2xl shadow-[0_0_40px_rgba(244,114,182,0.15)] flex flex-col overflow-hidden transition-all duration-500 origin-bottom-right ${chatOpen ? 'scale-100 opacity-100 mb-2 sm:mb-4' : 'scale-0 opacity-0 absolute bottom-0 right-0 pointer-events-none'}`}>
           <div className={`bg-gradient-to-r ${isDarkMode ? 'from-pink-500/20 to-purple-500/20 border-pink-500/20' : 'from-pink-100 to-purple-100 border-pink-200'} border-b p-3 flex justify-between items-center`}>
             <h3 className={`text-xs font-bold ${isDarkMode ? 'text-pink-300' : 'text-pink-700 font-extrabold'} tracking-[0.1em] flex items-center gap-2`}>
               <Zap className="w-3 h-3 text-pink-500" />
@@ -2411,7 +2417,7 @@ export default function PhaseConformDashboard() {
               </button>
             </div>
           </div>
-          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3 custom-scrollbar" ref={chatScrollRef}>
+          <div className="flex-1 overflow-y-auto p-3 sm:p-4 flex flex-col gap-3 custom-scrollbar" ref={chatScrollRef}>
             {chatHistory.map((msg, i) => (
               <div key={i} className={`max-w-[85%] rounded-xl p-3 text-[11px] ${msg.role === 'user' ? (isDarkMode ? 'bg-indigo-500/30 text-indigo-100 self-end rounded-br-sm' : 'bg-indigo-600 text-white self-end rounded-br-sm shadow-sm') : 'theme-card theme-text-main border theme-border self-start rounded-bl-sm shadow-sm'}`}>
                 {msg.text}
@@ -2425,13 +2431,13 @@ export default function PhaseConformDashboard() {
               </div>
             )}
           </div>
-          <form onSubmit={handleChatSubmit} className="p-3 theme-sub border-t theme-border flex gap-1.5 items-center">
+          <form onSubmit={handleChatSubmit} className="p-2.5 sm:p-3 theme-sub border-t theme-border flex gap-1.5 items-center">
             <input 
               type="text" 
               value={chatInput}
               onChange={e => setChatInput(e.target.value)}
               placeholder={isListening ? "Listening... Speak, then pause to auto-submit..." : "Ask Gemini or speak to rotate bond..."}
-              className={`flex-1 ${isDarkMode ? 'bg-[#1e1e2f] text-white border-white/5 focus:border-pink-500/50' : 'theme-card theme-text-main border theme-border focus:border-pink-500 shadow-inner'} border rounded-lg px-3 py-1.5 text-[11px] outline-none transition-all ${
+              className={`flex-1 ${isDarkMode ? 'bg-[#1e1e2f] text-white border-white/5 focus:border-pink-500/50' : 'theme-card theme-text-main border theme-border focus:border-pink-500 shadow-inner'} border rounded-lg px-2.5 sm:px-3 py-1.5 text-[11px] outline-none transition-all ${
                 isListening ? 'border-red-500/80 bg-red-950/20 placeholder-red-400 ring-1 ring-red-500/30' : ''
               }`}
             />
@@ -2439,7 +2445,7 @@ export default function PhaseConformDashboard() {
             <button
               type="button"
               onClick={toggleListening}
-              className={`p-1.5 rounded-lg border transition-all ${
+              className={`p-1.5 rounded-lg border transition-all shrink-0 ${
                 isListening 
                   ? 'bg-red-500/30 border-red-500 text-red-400 animate-pulse shadow-[0_0_12px_rgba(239,68,68,0.5)]' 
                   : (isDarkMode ? 'bg-[#1e1e2f] border-white/10 text-indigo-300 hover:text-white hover:border-pink-500/40' : 'theme-card border theme-border theme-text-main hover:opacity-80')
@@ -2448,7 +2454,7 @@ export default function PhaseConformDashboard() {
             >
               {isListening ? <MicOff className="w-4 h-4 text-red-500" /> : <Mic className="w-4 h-4" />}
             </button>
-            <button type="submit" disabled={isChatLoading || !chatInput.trim()} className="bg-pink-500/80 hover:bg-pink-400 text-white p-1.5 rounded-lg transition-colors disabled:opacity-50">
+            <button type="submit" disabled={isChatLoading || !chatInput.trim()} className="bg-pink-500/80 hover:bg-pink-400 text-white p-1.5 rounded-lg transition-colors disabled:opacity-50 shrink-0">
               <Zap className="w-4 h-4" />
             </button>
           </form>
@@ -2457,10 +2463,10 @@ export default function PhaseConformDashboard() {
         {/* Chat Toggle Button */}
         <button 
           onClick={() => setChatOpen(!chatOpen)}
-          className={`absolute bottom-0 right-0 w-14 h-14 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-[0_0_30px_rgba(244,114,182,0.4)] flex items-center justify-center transition-transform hover:scale-110 group ${chatOpen ? 'scale-0 opacity-0 pointer-events-none' : 'scale-100 opacity-100'}`}
+          className={`absolute bottom-0 right-0 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-[0_0_30px_rgba(244,114,182,0.4)] flex items-center justify-center transition-transform hover:scale-110 active:scale-95 group ${chatOpen ? 'scale-0 opacity-0 pointer-events-none' : 'scale-100 opacity-100'}`}
           title="Open Gemini AI Co-Pilot Assistant"
         >
-          <Zap className="w-6 h-6 animate-pulse" />
+          <Zap className="w-5 h-5 sm:w-6 sm:h-6 animate-pulse" />
           <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-pink-500 border border-white/40"></span>
