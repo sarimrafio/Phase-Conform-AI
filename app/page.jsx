@@ -2388,6 +2388,7 @@ export default function PhaseConformDashboard() {
         isDarkMode={isDarkMode}
         currentTheme={currentTheme}
         initialTab={notebookTab}
+        onLoadMolecule={(smiles) => fetchMoleculeData(smiles)}
       />
 
       {/* Gemini AI Floating Assistant */}

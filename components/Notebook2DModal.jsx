@@ -5,6 +5,289 @@ import {
   Sparkles, RefreshCw, Layers, ArrowRight, RotateCw, Info, CheckCircle2 
 } from 'lucide-react';
 
+// Dynamic Newman Substituent Extractor for ANY Compound
+function extractNewmanSubstituents(molData) {
+  if (!molData) {
+    return {
+      front: { top: "H", left: "H", right: "H" },
+      back: { top: "H", left: "H", right: "H" },
+      frontAtomName: "Front",
+      backAtomName: "Back",
+      hasRotatableBond: false
+    };
+  }
+
+  const atoms = molData.atoms || [];
+  const bonds = molData.bonds || [];
+  const activeBond = molData.active_bond || molData.rotatable_bond;
+
+  if (!activeBond || activeBond.a2 === undefined || activeBond.a3 === undefined) {
+    return {
+      front: { top: "CH₃", left: "H", right: "H" },
+      back: { top: "CH₃", left: "H", right: "H" },
+      frontAtomName: "C1",
+      backAtomName: "C2",
+      hasRotatableBond: false
+    };
+  }
+
+  const a2 = activeBond.a2;
+  const a3 = activeBond.a3;
+
+  const getSubstituentForAtom = (centerIdx, otherIdx) => {
+    const neighborBonds = bonds.filter(b => 
+      (b.start === centerIdx && b.end !== otherIdx) || 
+      (b.end === centerIdx && b.start !== otherIdx)
+    );
+
+    const labels = [];
+    neighborBonds.forEach(b => {
+      const nbrIdx = b.start === centerIdx ? b.end : b.start;
+      const nbr = atoms[nbrIdx];
+      if (!nbr) return;
+
+      const sym = nbr.symbol || nbr.element || 'C';
+
+      if (sym === 'H') {
+        labels.push("H");
+      } else if (sym === 'Cl' || sym === 'F' || sym === 'Br' || sym === 'I') {
+        labels.push(sym);
+      } else if (sym === 'O') {
+        const isOH = bonds.some(ob => 
+          (ob.start === nbrIdx || ob.end === nbrIdx) && 
+          (atoms[ob.start === nbrIdx ? ob.end : ob.start]?.symbol === 'H' || atoms[ob.start === nbrIdx ? ob.end : ob.start]?.element === 'H')
+        );
+        labels.push(isOH ? "OH" : "O–R");
+      } else if (sym === 'N') {
+        labels.push("NH₂");
+      } else if (sym === 'C') {
+        const subBonds = bonds.filter(sb => 
+          (sb.start === nbrIdx && sb.end !== centerIdx) || 
+          (sb.end === nbrIdx && sb.start !== centerIdx)
+        );
+        const heavySub = subBonds.filter(sb => {
+          const atIdx = sb.start === nbrIdx ? sb.end : sb.start;
+          const s = atoms[atIdx]?.symbol || atoms[atIdx]?.element;
+          return s && s !== 'H';
+        });
+
+        if (heavySub.length === 0) {
+          labels.push("CH₃");
+        } else if (heavySub.length === 1) {
+          const firstAtIdx = heavySub[0].start === nbrIdx ? heavySub[0].end : heavySub[0].start;
+          const firstSym = atoms[firstAtIdx]?.symbol || atoms[firstAtIdx]?.element;
+          if (firstSym === 'O') labels.push("CHO");
+          else labels.push("CH₂CH₃");
+        } else {
+          const hasOxygen = heavySub.some(sb => {
+            const atIdx = sb.start === nbrIdx ? sb.end : sb.start;
+            const s = atoms[atIdx]?.symbol || atoms[atIdx]?.element;
+            return s === 'O';
+          });
+          if (hasOxygen) labels.push("COOH");
+          else labels.push("R-Alkyl");
+        }
+      } else {
+        labels.push(sym);
+      }
+    });
+
+    while (labels.length < 3) {
+      labels.push("H");
+    }
+
+    labels.sort((a, b) => {
+      if (a === "H" && b !== "H") return 1;
+      if (a !== "H" && b === "H") return -1;
+      return 0;
+    });
+
+    return {
+      top: labels[0] || "H",
+      left: labels[1] || "H",
+      right: labels[2] || "H"
+    };
+  };
+
+  const frontSym = atoms[a2]?.symbol || atoms[a2]?.element || 'C';
+  const backSym = atoms[a3]?.symbol || atoms[a3]?.element || 'C';
+
+  return {
+    front: getSubstituentForAtom(a2, a3),
+    back: getSubstituentForAtom(a3, a2),
+    frontAtomName: `${frontSym}${a2 + 1}`,
+    backAtomName: `${backSym}${a3 + 1}`,
+    hasRotatableBond: true
+  };
+}
+
+// 6-Membered Saturated Cyclohexane Ring Analyzer
+function analyzeCyclohexaneRing(molData) {
+  if (!molData) return { hasRing: false, ringType: null, name: null, substituent: null, aValue: 0 };
+  const smiles = molData.smiles || "";
+
+  if (smiles === 'C1CCCCC1') {
+    return { hasRing: true, ringType: 'cyclohexane', name: 'Cyclohexane', substituent: null, aValue: 0.0 };
+  }
+  if (smiles === 'CC1CCCCC1') {
+    return { hasRing: true, ringType: 'methylcyclohexane', name: 'Methylcyclohexane', substituent: 'CH₃', aValue: 7.3 };
+  }
+  if (smiles === 'OC1CCCCC1') {
+    return { hasRing: true, ringType: 'cyclohexanol', name: 'Cyclohexanol', substituent: 'OH', aValue: 3.8 };
+  }
+  if (smiles === 'ClC1CCCCC1') {
+    return { hasRing: true, ringType: 'chlorocyclohexane', name: 'Chlorocyclohexane', substituent: 'Cl', aValue: 2.2 };
+  }
+  if (smiles.includes('C1CCCCC1') || smiles.includes('C1CCCC1') || smiles.includes('1CCCCC1')) {
+    return { hasRing: true, ringType: 'substituted_cyclohexane', name: 'Substituted Cyclohexane', substituent: 'R', aValue: 5.0 };
+  }
+  if (smiles.includes('OC[C@H]1OC') || smiles.includes('C1OC(O)C(O)C(O)C1')) {
+    return { hasRing: true, ringType: 'glucose', name: 'D-Glucose Pyranose Ring', substituent: 'OH / CH₂OH', aValue: 8.5 };
+  }
+
+  return { hasRing: false, ringType: null, name: molData.name || "Acyclic Compound", substituent: null, aValue: 0 };
+}
+
+// Fischer Projection Chirality Analyzer
+function analyzeFischerChirality(molData) {
+  if (!molData) return { isChiral: false, stereocenters: [], configType: null };
+  const smiles = molData.smiles || "";
+  const atoms = molData.atoms || [];
+
+  if (smiles === 'CC(N)C(=O)O' || smiles === 'N[C@@H](C)C(=O)O' || smiles === 'N[C@H](C)C(=O)O') {
+    return {
+      isChiral: true,
+      configType: 'alanine',
+      name: 'L-Alanine',
+      formula: 'C3H7NO2',
+      chiralCount: 1,
+      top: 'COOH',
+      center: { name: 'Cα (S)', left: 'H₂N', right: 'H' },
+      bottom: 'CH₃',
+      dlFamily: 'L-Amino Acid',
+      cip: '(S)-Alanine'
+    };
+  }
+
+  if (smiles === 'OCC(O)C=O' || smiles === 'O=C[C@H](O)CO') {
+    return {
+      isChiral: true,
+      configType: 'glyceraldehyde_d',
+      name: 'D-Glyceraldehyde',
+      formula: 'C3H6O3',
+      chiralCount: 1,
+      top: 'CHO',
+      center: { name: 'C2 (2R)', left: 'H', right: 'OH' },
+      bottom: 'CH₂OH',
+      dlFamily: 'D-Sugar (Standard)',
+      cip: '(2R)-Glyceraldehyde'
+    };
+  }
+
+  if (smiles === 'O=C[C@@H](O)CO') {
+    return {
+      isChiral: true,
+      configType: 'glyceraldehyde_l',
+      name: 'L-Glyceraldehyde',
+      formula: 'C3H6O3',
+      chiralCount: 1,
+      top: 'CHO',
+      center: { name: 'C2 (2S)', left: 'HO', right: 'H' },
+      bottom: 'CH₂OH',
+      dlFamily: 'L-Sugar',
+      cip: '(2S)-Glyceraldehyde'
+    };
+  }
+
+  if (smiles.includes('C(O)C(O)C(=O)O') || smiles.includes('O=C(O)C(O)C(O)C(=O)O')) {
+    return {
+      isChiral: true,
+      configType: 'tartaric_rr',
+      name: '(2R,3R)-Tartaric Acid',
+      formula: 'C4H6O6',
+      chiralCount: 2,
+      top: 'COOH',
+      centers: [
+        { name: 'C2 (2R)', left: 'H', right: 'OH' },
+        { name: 'C3 (3R)', left: 'HO', right: 'H' }
+      ],
+      bottom: 'COOH',
+      dlFamily: 'Chiral Tartrate',
+      cip: '(2R,3R)'
+    };
+  }
+
+  if (smiles.includes('OC[C@H]1OC') || smiles.includes('C(C(C(C(C=O)O)O)O)O') || smiles === 'OC[C@@H]1OC(O)[C@@H](O)[C@H](O)[C@H]1O') {
+    return {
+      isChiral: true,
+      configType: 'glucose',
+      name: 'D-Glucose',
+      formula: 'C6H12O6',
+      chiralCount: 4,
+      top: 'CHO',
+      centers: [
+        { name: 'C2 (2R)', left: 'H', right: 'OH' },
+        { name: 'C3 (3S)', left: 'OH', right: 'H' },
+        { name: 'C4 (4R)', left: 'H', right: 'OH' },
+        { name: 'C5 (5R)', left: 'H', right: 'OH' }
+      ],
+      bottom: 'CH₂OH',
+      dlFamily: 'D-Aldohexose',
+      cip: '(2R,3S,4R,5R)'
+    };
+  }
+
+  if (smiles === 'CCC(O)C' || smiles === 'CC(O)CC') {
+    return {
+      isChiral: true,
+      configType: 'generic_chiral',
+      name: '2-Butanol',
+      formula: 'C4H10O',
+      chiralCount: 1,
+      top: 'CH₃ (C1)',
+      center: { name: 'C2 (2S)', left: 'HO', right: 'H' },
+      bottom: 'CH₂CH₃ (C3–C4)',
+      dlFamily: 'Chiral Alcohol',
+      cip: '(2S)-sec-Butanol'
+    };
+  }
+
+  if (smiles === 'CCC(Cl)C' || smiles === 'CC(Cl)CC') {
+    return {
+      isChiral: true,
+      configType: 'generic_chiral',
+      name: '2-Chlorobutane',
+      formula: 'C4H9Cl',
+      chiralCount: 1,
+      top: 'CH₃ (C1)',
+      center: { name: 'C2 (2S)', left: 'Cl', right: 'H' },
+      bottom: 'CH₂CH₃ (C3–C4)',
+      dlFamily: 'Chiral Halide',
+      cip: '(2S)-Chlorobutane'
+    };
+  }
+
+  const chiralAtoms = atoms.filter(a => a.stereo === 'R' || a.stereo === 'S');
+  const hasAtInSmiles = smiles.includes('@');
+
+  if (chiralAtoms.length > 0 || hasAtInSmiles) {
+    return {
+      isChiral: true,
+      configType: 'generic_chiral',
+      name: molData.name || 'Chiral Compound',
+      formula: molData.formula || '',
+      chiralCount: Math.max(chiralAtoms.length, 1),
+      top: 'C-Terminal / Oxidized',
+      center: { name: chiralAtoms[0] ? `C${chiralAtoms[0].index + 1} (${chiralAtoms[0].stereo})` : 'C* (Chiral)', left: 'Group A', right: 'Group B' },
+      bottom: 'Alkyl / Alkane Tail',
+      dlFamily: 'Chiral Stereoisomer',
+      cip: chiralAtoms.map(a => `${a.element}${a.index + 1}: ${a.stereo}`).join(', ') || 'Chiral'
+    };
+  }
+
+  return { isChiral: false, stereocenters: [], configType: null };
+}
+
 export default function Notebook2DModal({
   isOpen,
   onClose,
@@ -16,7 +299,8 @@ export default function Notebook2DModal({
   clashData,
   isDarkMode = true,
   currentTheme = {},
-  initialTab = 'skeletal'
+  initialTab = 'skeletal',
+  onLoadMolecule
 }) {
   const [activeTab, setActiveTab] = useState(initialTab); // 'skeletal' | 'newman' | 'chair-boat' | 'fischer' | 'guide'
 
@@ -38,8 +322,19 @@ export default function Notebook2DModal({
   const [highlightFlagpole, setHighlightFlagpole] = useState(true);
 
   // Fischer State
-  const [fischerPreset, setFischerPreset] = useState('glucose'); // 'glucose' | 'glyceraldehyde_d' | 'glyceraldehyde_l' | 'alanine' | 'tartaric_rr' | 'tartaric_meso'
+  const [fischerPreset, setFischerPreset] = useState('active'); // 'active' | 'glucose' | 'glyceraldehyde_d' | 'glyceraldehyde_l' | 'alanine' | 'tartaric_rr' | 'tartaric_meso'
   const [showFischer3DWedges, setShowFischer3DWedges] = useState(true);
+
+  // Automatically select Active Molecule when a chiral compound is loaded
+  useEffect(() => {
+    if (!moleculeData) return;
+    const ch = analyzeFischerChirality(moleculeData);
+    if (ch.isChiral) {
+      setFischerPreset('active');
+    } else {
+      setFischerPreset('glucose');
+    }
+  }, [moleculeData?.smiles]);
 
   const newmanSvgRef = useRef(null);
   const skeletalContainerRef = useRef(null);
@@ -125,21 +420,16 @@ export default function Notebook2DModal({
     conformerBadge = "bg-pink-500/20 text-pink-300 border-pink-400/40";
   }
 
-  // Substituent labels for Newman projection
-  const isEthane = smiles === 'CC';
-  const isPropane = smiles === 'CCC';
+  // Substituent labels for Newman projection - dynamically extracted for ANY compound
+  const newmanData = extractNewmanSubstituents(moleculeData);
+  const frontSubstituents = newmanData.front;
+  const backSubstituents = newmanData.back;
+  const frontAtomLabel = newmanData.frontAtomName;
+  const backAtomLabel = newmanData.backAtomName;
 
-  const frontSubstituents = isEthane 
-    ? { top: "H", left: "H", right: "H" }
-    : isPropane
-    ? { top: "CH₃", left: "H", right: "H" }
-    : { top: "CH₃", left: "H", right: "H" };
-
-  const backSubstituents = isEthane
-    ? { top: "H", left: "H", right: "H" }
-    : isPropane
-    ? { top: "H", left: "H", right: "H" }
-    : { top: "CH₃", left: "H", right: "H" };
+  // Active ring & chirality analyzers
+  const ringAnalysis = analyzeCyclohexaneRing(moleculeData);
+  const chirality = analyzeFischerChirality(moleculeData);
 
   const cx = 200;
   const cy = 200;
@@ -520,7 +810,7 @@ CONFORMATION & STEREOCENTER SUMMARY:
                     {conformerName}
                   </span>
                   <span className="text-xs text-slate-400 font-mono">
-                    Dihedral θ = <strong className="text-indigo-400 text-sm">{normAngle}°</strong>
+                    Dihedral θ = <strong className="text-indigo-400 text-sm">{normAngle}°</strong> ({frontAtomLabel} ➔ {backAtomLabel})
                   </span>
                 </div>
 
@@ -642,6 +932,8 @@ CONFORMATION & STEREOCENTER SUMMARY:
                     })}
 
                     <circle cx={cx} cy={cy} r="6" fill="#ec4899" stroke="#ffffff" strokeWidth="1.5" />
+                    <text x={cx} y={cy - 12} fill="#ec4899" fontSize="9" fontWeight="bold" textAnchor="middle">{frontAtomLabel} (Front)</text>
+                    <text x={cx} y={cy + 20} fill="#8b5cf6" fontSize="9" fontWeight="bold" textAnchor="middle">{backAtomLabel} (Back)</text>
 
                     {normAngle > 8 && normAngle < 352 && (
                       <g>
@@ -752,12 +1044,76 @@ CONFORMATION & STEREOCENTER SUMMARY:
           {/* TAB 3: CHAIR-BOAT CONFORMATIONS */}
           {activeTab === 'chair-boat' && (
             <div className="flex flex-col gap-5">
+              {/* Dynamic Ring Status Banner */}
+              {ringAnalysis.hasRing ? (
+                <div className="p-3.5 rounded-xl bg-pink-500/10 border border-pink-500/25 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+                  <div className="flex items-start gap-2.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 mt-1 animate-pulse shrink-0"></span>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-xs font-bold text-pink-300">
+                          🌟 Active Ring: {ringAnalysis.name} ({name || '6-Membered Ring'})
+                        </span>
+                        <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                          C1: -{ringAnalysis.substituent || 'H'}
+                        </span>
+                        {ringAnalysis.aValue > 0 && (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                            Conformational A-value: ΔG° = {ringAnalysis.aValue} kJ/mol
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-slate-300 mt-0.5">
+                        In <strong>Chair 1</strong>, the bulky -{ringAnalysis.substituent || 'H'} adopts the <strong className="text-emerald-300">Equatorial</strong> position (minimum 1,3-diaxial strain). In <strong>Chair 2 (Flipped)</strong>, it flips to <strong className="text-rose-300">Axial</strong>, clashing with syn-axial hydrogens!
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-3.5 rounded-xl bg-sky-500/10 border border-sky-500/20 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3">
+                  <div className="flex items-start gap-2.5">
+                    <Info className="w-4 h-4 text-sky-400 mt-0.5 shrink-0" />
+                    <div>
+                      <span className="text-xs font-bold text-sky-300">
+                        Current Molecule ({name || 'Open-Chain Molecule'}) is Acyclic / Non-Cyclohexyl
+                      </span>
+                      <p className="text-[11px] text-slate-300 mt-0.5">
+                        Chair and boat conformations apply specifically to 6-membered saturated rings (cyclohexane systems) where chair puckering eliminates ring strain. For open chains like butane, use the <strong>Newman Projection</strong> tab. Quick-load 6-membered rings to study chair ring-flipping:
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0 flex-wrap">
+                    <button
+                      onClick={() => onLoadMolecule && onLoadMolecule('C1CCCCC1')}
+                      className="px-2.5 py-1 rounded-lg text-xs font-bold bg-white/10 hover:bg-pink-600 hover:text-white text-slate-200 transition-all border border-white/10"
+                      title="Load Cyclohexane (SMILES: C1CCCCC1)"
+                    >
+                      🪑 Cyclohexane
+                    </button>
+                    <button
+                      onClick={() => onLoadMolecule && onLoadMolecule('CC1CCCCC1')}
+                      className="px-2.5 py-1 rounded-lg text-xs font-bold bg-white/10 hover:bg-pink-600 hover:text-white text-slate-200 transition-all border border-white/10"
+                      title="Load Methylcyclohexane (SMILES: CC1CCCCC1)"
+                    >
+                      🧪 Methylcyclohexane
+                    </button>
+                    <button
+                      onClick={() => onLoadMolecule && onLoadMolecule('OC[C@@H]1OC(O)[C@@H](O)[C@H](O)[C@H]1O')}
+                      className="px-2.5 py-1 rounded-lg text-xs font-bold bg-white/10 hover:bg-pink-600 hover:text-white text-slate-200 transition-all border border-white/10"
+                      title="Load D-Glucose"
+                    >
+                      🍬 D-Glucose
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* Conformation Selector Bar */}
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-1.5 p-1 rounded-xl bg-black/20 border border-white/5 overflow-x-auto">
                   {[
                     { id: 'chair1', label: '🪑 Chair 1', deltaE: '0.0 kJ/mol' },
-                    { id: 'chair2', label: '🔄 Flipped Chair 2', deltaE: '0.0 kJ/mol' },
+                    { id: 'chair2', label: '🔄 Flipped Chair 2', deltaE: ringAnalysis.aValue > 0 ? `+${ringAnalysis.aValue} kJ/mol` : '0.0 kJ/mol' },
                     { id: 'boat', label: '⛵ Boat Conformation', deltaE: '+30.0 kJ/mol' },
                     { id: 'twist', label: '🌀 Twist-Boat', deltaE: '+23.0 kJ/mol' },
                     { id: 'half', label: '⚡ Half-Chair', deltaE: '+45.0 kJ/mol' },
@@ -847,7 +1203,7 @@ CONFORMATION & STEREOCENTER SUMMARY:
                             <line x1="180" y1="90" x2="135" y2="105" stroke="#34d399" strokeWidth="3" />
                             <text x="120" y="110" fill="#34d399" fontSize="11" fontWeight="bold" textAnchor="middle">e</text>
 
-                            {/* C6(280, 90): Vertex DOWN -> Axial DOWN (280, 150) - wait, C6 vertex points DOWN relative to C1? */}
+                            {/* C6(280, 90): Vertex DOWN -> Axial DOWN (280, 150) */}
                             <line x1="280" y1="90" x2="280" y2="150" stroke="#38bdf8" strokeWidth="3" />
                             <text x="280" y="165" fill="#38bdf8" fontSize="11" fontWeight="bold" textAnchor="middle">a (DN)</text>
                             <line x1="280" y1="90" x2="325" y2="75" stroke="#34d399" strokeWidth="3" />
@@ -855,9 +1211,13 @@ CONFORMATION & STEREOCENTER SUMMARY:
 
                             {/* C1(320, 160): Vertex UP -> Axial UP (320, 105) */}
                             <line x1="320" y1="160" x2="320" y2="105" stroke="#38bdf8" strokeWidth="3" />
-                            <text x="320" y="95" fill="#38bdf8" fontSize="11" fontWeight="bold" textAnchor="middle">a (UP)</text>
-                            <line x1="320" y1="160" x2="375" y2="185" stroke="#34d399" strokeWidth="3" />
-                            <text x="390" y="190" fill="#34d399" fontSize="11" fontWeight="bold" textAnchor="middle">e</text>
+                            <text x="320" y="95" fill="#38bdf8" fontSize="11" fontWeight="bold" textAnchor="middle">a (UP: -H)</text>
+                            <line x1="320" y1="160" x2="375" y2="185" stroke="#10b981" strokeWidth="3.5" />
+                            <text x="385" y="190" fill="#10b981" fontSize="12" fontWeight="extrabold">
+                              {ringAnalysis.hasRing && ringAnalysis.substituent && ringAnalysis.substituent !== 'H'
+                                ? `e: -${ringAnalysis.substituent} (Equatorial ★)`
+                                : 'e (Equatorial)'}
+                            </text>
 
                             {/* C2(260, 240): Vertex DOWN -> Axial DOWN (260, 305) */}
                             <line x1="260" y1="240" x2="260" y2="300" stroke="#38bdf8" strokeWidth="3" />
@@ -914,14 +1274,40 @@ CONFORMATION & STEREOCENTER SUMMARY:
                             <text x="160" y="165" fill="#38bdf8" fontSize="11" fontWeight="bold" textAnchor="middle">a (DN)</text>
                             <line x1="260" y1="90" x2="260" y2="35" stroke="#38bdf8" strokeWidth="3" />
                             <text x="260" y="25" fill="#38bdf8" fontSize="11" fontWeight="bold" textAnchor="middle">a (UP)</text>
-                            <line x1="300" y1="170" x2="300" y2="230" stroke="#38bdf8" strokeWidth="3" />
-                            <text x="300" y="245" fill="#38bdf8" fontSize="11" fontWeight="bold" textAnchor="middle">a (DN)</text>
+                            
+                            {/* C1(300, 170): Flipped to AXIAL DOWN with steric clash */}
+                            <line x1="300" y1="170" x2="300" y2="235" stroke="#f43f5e" strokeWidth="3.5" />
+                            <text x="300" y="250" fill="#f43f5e" fontSize="11" fontWeight="extrabold" textAnchor="middle">
+                              {ringAnalysis.hasRing && ringAnalysis.substituent && ringAnalysis.substituent !== 'H'
+                                ? `a: -${ringAnalysis.substituent} (Axial Clash!)`
+                                : 'a (DN)'}
+                            </text>
+                            {/* C1 Equatorial is now -H */}
+                            <line x1="300" y1="170" x2="355" y2="150" stroke="#34d399" strokeWidth="2.5" />
+                            <text x="365" y="150" fill="#34d399" fontSize="11" fontWeight="bold">e: -H</text>
+
                             <line x1="240" y1="240" x2="240" y2="180" stroke="#38bdf8" strokeWidth="3" />
                             <text x="240" y="170" fill="#38bdf8" fontSize="11" fontWeight="bold" textAnchor="middle">a (UP)</text>
                             <line x1="140" y1="240" x2="140" y2="300" stroke="#38bdf8" strokeWidth="3" />
                             <text x="140" y="315" fill="#38bdf8" fontSize="11" fontWeight="bold" textAnchor="middle">a (DN)</text>
                             <line x1="100" y1="160" x2="100" y2="105" stroke="#38bdf8" strokeWidth="3" />
                             <text x="100" y="95" fill="#38bdf8" fontSize="11" fontWeight="bold" textAnchor="middle">a (UP)</text>
+
+                            {/* 1,3-Diaxial Steric Clash Repulsion Indicator for Substituted Ring */}
+                            {ringAnalysis.hasRing && ringAnalysis.substituent && ringAnalysis.substituent !== 'H' && (
+                              <g>
+                                <path
+                                  d="M 290 230 Q 215 285 150 295"
+                                  fill="none"
+                                  stroke="#f43f5e"
+                                  strokeWidth="2.5"
+                                  strokeDasharray="4 4"
+                                />
+                                <text x="220" y="280" fill="#f43f5e" fontSize="10" fontWeight="extrabold" textAnchor="middle">
+                                  ⚡ 1,3-Diaxial Repulsion ({ringAnalysis.aValue > 0 ? `+${ringAnalysis.aValue} kJ/mol` : 'Severe Steric Clash'})
+                                </text>
+                              </g>
+                            )}
                           </g>
                         )}
 
@@ -1144,9 +1530,83 @@ CONFORMATION & STEREOCENTER SUMMARY:
           {/* TAB 4: FISCHER CONFIGURATION */}
           {activeTab === 'fischer' && (
             <div className="flex flex-col gap-5">
+              {/* Dynamic Chiral Status Banner */}
+              {chirality.isChiral ? (
+                <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/25 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+                  <div className="flex items-start gap-2.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400 mt-1 animate-pulse shrink-0"></span>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-xs font-bold text-amber-300">
+                          🌟 Active Molecule: {chirality.name} ({name || 'Chiral Compound'})
+                        </span>
+                        <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                          {chirality.chiralCount} Stereocenter{chirality.chiralCount > 1 ? 's' : ''} • {chirality.cip}
+                        </span>
+                        <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                          {chirality.dlFamily}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-300 mt-0.5">
+                        Fischer projection oriented with C1 at the TOP. Horizontal arms project <strong>toward you (wedges)</strong>, vertical backbone projects <strong>away from you (dashes)</strong>.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-3.5 rounded-xl bg-sky-500/10 border border-sky-500/20 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3">
+                  <div className="flex items-start gap-2.5">
+                    <Info className="w-4 h-4 text-sky-400 mt-0.5 shrink-0" />
+                    <div>
+                      <span className="text-xs font-bold text-sky-300">
+                        Current Molecule ({name || 'Achiral Compound'}) Has No Asymmetric Chiral Centers
+                      </span>
+                      <p className="text-[11px] text-slate-300 mt-0.5">
+                        Fischer projections specifically represent stereocenters with sp³ tetrahedral carbons bonded to 4 distinct groups (e.g. amino acids, carbohydrates). Displaying standard chiral reference systems below. Quick-load chiral compounds:
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0 flex-wrap">
+                    <button
+                      onClick={() => onLoadMolecule && onLoadMolecule('CC(N)C(=O)O')}
+                      className="px-2.5 py-1 rounded-lg text-xs font-bold bg-white/10 hover:bg-amber-600 hover:text-white text-slate-200 transition-all border border-white/10"
+                      title="Load L-Alanine (SMILES: CC(N)C(=O)O)"
+                    >
+                      🧬 L-Alanine
+                    </button>
+                    <button
+                      onClick={() => onLoadMolecule && onLoadMolecule('OCC(O)C=O')}
+                      className="px-2.5 py-1 rounded-lg text-xs font-bold bg-white/10 hover:bg-amber-600 hover:text-white text-slate-200 transition-all border border-white/10"
+                      title="Load D-Glyceraldehyde (SMILES: OCC(O)C=O)"
+                    >
+                      ⭐ D-Glyceraldehyde
+                    </button>
+                    <button
+                      onClick={() => onLoadMolecule && onLoadMolecule('OC[C@@H]1OC(O)[C@@H](O)[C@H](O)[C@H]1O')}
+                      className="px-2.5 py-1 rounded-lg text-xs font-bold bg-white/10 hover:bg-amber-600 hover:text-white text-slate-200 transition-all border border-white/10"
+                      title="Load D-Glucose"
+                    >
+                      🍬 D-Glucose
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* Fischer Molecule Presets & Toggle Bar */}
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-1.5 p-1 rounded-xl bg-black/20 border border-white/5 overflow-x-auto">
+                  {chirality.isChiral && (
+                    <button
+                      onClick={() => setFischerPreset('active')}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 ${
+                        fischerPreset === 'active'
+                          ? 'bg-amber-600 text-white shadow-sm'
+                          : 'text-amber-300 hover:text-white hover:bg-amber-500/20'
+                      }`}
+                    >
+                      <span>🌟 {chirality.name} (Active)</span>
+                    </button>
+                  )}
                   {[
                     { id: 'glucose', label: '🍬 D-Glucose (Aldohexose)' },
                     { id: 'glyceraldehyde_d', label: '⭐ D-Glyceraldehyde (Reference)' },
@@ -1218,6 +1678,145 @@ CONFORMATION & STEREOCENTER SUMMARY:
                     height="380"
                     className="max-w-[340px] drop-shadow-md select-none overflow-visible"
                   >
+                    {/* ACTIVE CHIRAL MOLECULE FISCHER */}
+                    {fischerPreset === 'active' && (
+                      chirality.configType === 'alanine' ? (
+                        <g>
+                          <line x1="190" y1="80" x2="190" y2="340" stroke={showFischer3DWedges ? "#94a3b8" : (isDarkMode ? "#cbd5e1" : "#1e293b")} strokeWidth="4" strokeDasharray={showFischer3DWedges ? "6 4" : "none"} />
+                          <text x="190" y="70" fill="#f43f5e" fontSize="18" fontWeight="bold" textAnchor="middle">COOH (C1)</text>
+
+                          {showFischer3DWedges ? (
+                            <>
+                              <polygon points="190,210 90,202 90,218" fill="#ec4899" />
+                              <polygon points="190,210 290,202 290,218" fill="#ec4899" />
+                            </>
+                          ) : (
+                            <line x1="90" y1="210" x2="290" y2="210" stroke="#ec4899" strokeWidth="4.5" />
+                          )}
+                          <text x="75" y="216" fill="#ec4899" fontSize="18" fontWeight="extrabold" textAnchor="end">H₂N (Left = L)</text>
+                          <circle cx="190" cy="210" r="7" fill="#ec4899" />
+                          <text x="190" y="198" fill="#ec4899" fontSize="11" fontWeight="bold" textAnchor="middle">Cα (2S) ★</text>
+                          <text x="305" y="216" fill="#38bdf8" fontSize="17" fontWeight="bold">H</text>
+
+                          <text x="190" y="365" fill="#f43f5e" fontSize="18" fontWeight="bold" textAnchor="middle">CH₃ (C3)</text>
+                        </g>
+                      ) : chirality.configType === 'glyceraldehyde_d' ? (
+                        <g>
+                          <line x1="190" y1="80" x2="190" y2="340" stroke={showFischer3DWedges ? "#94a3b8" : (isDarkMode ? "#cbd5e1" : "#1e293b")} strokeWidth="4" strokeDasharray={showFischer3DWedges ? "6 4" : "none"} />
+                          <text x="190" y="70" fill="#f43f5e" fontSize="18" fontWeight="bold" textAnchor="middle">CHO (C1)</text>
+
+                          {showFischer3DWedges ? (
+                            <>
+                              <polygon points="190,210 90,202 90,218" fill="#10b981" />
+                              <polygon points="190,210 290,202 290,218" fill="#10b981" />
+                            </>
+                          ) : (
+                            <line x1="90" y1="210" x2="290" y2="210" stroke="#10b981" strokeWidth="4.5" />
+                          )}
+                          <text x="75" y="216" fill="#38bdf8" fontSize="17" fontWeight="bold" textAnchor="end">H</text>
+                          <circle cx="190" cy="210" r="7" fill="#10b981" />
+                          <text x="190" y="198" fill="#10b981" fontSize="11" fontWeight="bold" textAnchor="middle">C2 (2R) ★</text>
+                          <text x="305" y="216" fill="#10b981" fontSize="18" fontWeight="extrabold">OH (Right = D)</text>
+
+                          <text x="190" y="365" fill="#f43f5e" fontSize="18" fontWeight="bold" textAnchor="middle">CH₂OH (C3)</text>
+                        </g>
+                      ) : chirality.configType === 'glyceraldehyde_l' ? (
+                        <g>
+                          <line x1="190" y1="80" x2="190" y2="340" stroke={showFischer3DWedges ? "#94a3b8" : (isDarkMode ? "#cbd5e1" : "#1e293b")} strokeWidth="4" strokeDasharray={showFischer3DWedges ? "6 4" : "none"} />
+                          <text x="190" y="70" fill="#f43f5e" fontSize="18" fontWeight="bold" textAnchor="middle">CHO (C1)</text>
+
+                          {showFischer3DWedges ? (
+                            <>
+                              <polygon points="190,210 90,202 90,218" fill="#ec4899" />
+                              <polygon points="190,210 290,202 290,218" fill="#ec4899" />
+                            </>
+                          ) : (
+                            <line x1="90" y1="210" x2="290" y2="210" stroke="#ec4899" strokeWidth="4.5" />
+                          )}
+                          <text x="75" y="216" fill="#ec4899" fontSize="18" fontWeight="extrabold" textAnchor="end">HO (Left = L)</text>
+                          <circle cx="190" cy="210" r="7" fill="#ec4899" />
+                          <text x="190" y="198" fill="#ec4899" fontSize="11" fontWeight="bold" textAnchor="middle">C2 (2S) ★</text>
+                          <text x="305" y="216" fill="#38bdf8" fontSize="17" fontWeight="bold">H</text>
+
+                          <text x="190" y="365" fill="#f43f5e" fontSize="18" fontWeight="bold" textAnchor="middle">CH₂OH (C3)</text>
+                        </g>
+                      ) : chirality.configType === 'glucose' ? (
+                        <g>
+                          <line x1="190" y1="50" x2="190" y2="390" stroke={showFischer3DWedges ? "#94a3b8" : (isDarkMode ? "#cbd5e1" : "#1e293b")} strokeWidth="4" strokeDasharray={showFischer3DWedges ? "6 4" : "none"} />
+                          <text x="190" y="40" fill="#f43f5e" fontSize="16" fontWeight="bold" textAnchor="middle">CHO (C1)</text>
+
+                          {/* C2 */}
+                          <line x1="110" y1="110" x2="270" y2="110" stroke={isDarkMode ? "#cbd5e1" : "#1e293b"} strokeWidth="4" />
+                          <text x="95" y="115" fill="#38bdf8" fontSize="15" fontWeight="bold" textAnchor="end">H</text>
+                          <circle cx="190" cy="110" r="5" fill="#f59e0b" />
+                          <text x="190" y="102" fill="#94a3b8" fontSize="9" fontWeight="bold" textAnchor="middle">C2 (R)</text>
+                          <text x="285" y="115" fill="#ef4444" fontSize="15" fontWeight="bold">OH</text>
+
+                          {/* C3 */}
+                          <line x1="110" y1="170" x2="270" y2="170" stroke={isDarkMode ? "#cbd5e1" : "#1e293b"} strokeWidth="4" />
+                          <text x="95" y="175" fill="#ef4444" fontSize="15" fontWeight="bold" textAnchor="end">HO</text>
+                          <circle cx="190" cy="170" r="5" fill="#f59e0b" />
+                          <text x="190" y="162" fill="#94a3b8" fontSize="9" fontWeight="bold" textAnchor="middle">C3 (S)</text>
+                          <text x="285" y="175" fill="#38bdf8" fontSize="15" fontWeight="bold">H</text>
+
+                          {/* C4 */}
+                          <line x1="110" y1="230" x2="270" y2="230" stroke={isDarkMode ? "#cbd5e1" : "#1e293b"} strokeWidth="4" />
+                          <text x="95" y="235" fill="#38bdf8" fontSize="15" fontWeight="bold" textAnchor="end">H</text>
+                          <circle cx="190" cy="230" r="5" fill="#f59e0b" />
+                          <text x="190" y="222" fill="#94a3b8" fontSize="9" fontWeight="bold" textAnchor="middle">C4 (R)</text>
+                          <text x="285" y="235" fill="#ef4444" fontSize="15" fontWeight="bold">OH</text>
+
+                          {/* C5 */}
+                          <line x1="110" y1="290" x2="270" y2="290" stroke="#10b981" strokeWidth="4.5" />
+                          <text x="95" y="295" fill="#38bdf8" fontSize="15" fontWeight="bold" textAnchor="end">H</text>
+                          <circle cx="190" cy="290" r="7" fill="#10b981" />
+                          <text x="190" y="282" fill="#10b981" fontSize="9" fontWeight="bold" textAnchor="middle">C5 (R) ★</text>
+                          <text x="285" y="295" fill="#10b981" fontSize="16" fontWeight="extrabold">OH (D-Sugar)</text>
+
+                          <text x="190" y="410" fill="#f43f5e" fontSize="16" fontWeight="bold" textAnchor="middle">CH₂OH (C6)</text>
+                        </g>
+                      ) : chirality.configType === 'tartaric_rr' ? (
+                        <g>
+                          <line x1="190" y1="70" x2="190" y2="350" stroke={showFischer3DWedges ? "#94a3b8" : (isDarkMode ? "#cbd5e1" : "#1e293b")} strokeWidth="4" strokeDasharray={showFischer3DWedges ? "6 4" : "none"} />
+                          <text x="190" y="60" fill="#f43f5e" fontSize="18" fontWeight="bold" textAnchor="middle">COOH (C1)</text>
+
+                          <line x1="100" y1="160" x2="280" y2="160" stroke="#f59e0b" strokeWidth="4" />
+                          <text x="85" y="165" fill="#38bdf8" fontSize="16" fontWeight="bold" textAnchor="end">H</text>
+                          <circle cx="190" cy="160" r="6" fill="#f59e0b" />
+                          <text x="190" y="150" fill="#f59e0b" fontSize="10" fontWeight="bold" textAnchor="middle">C2 (2R)</text>
+                          <text x="295" y="165" fill="#ef4444" fontSize="16" fontWeight="bold">OH</text>
+
+                          <line x1="100" y1="260" x2="280" y2="260" stroke="#f59e0b" strokeWidth="4" />
+                          <text x="85" y="265" fill="#ef4444" fontSize="16" fontWeight="bold" textAnchor="end">HO</text>
+                          <circle cx="190" cy="260" r="6" fill="#f59e0b" />
+                          <text x="190" y="250" fill="#f59e0b" fontSize="10" fontWeight="bold" textAnchor="middle">C3 (3R)</text>
+                          <text x="295" y="265" fill="#38bdf8" fontSize="16" fontWeight="bold">H</text>
+
+                          <text x="190" y="375" fill="#f43f5e" fontSize="18" fontWeight="bold" textAnchor="middle">COOH (C4)</text>
+                        </g>
+                      ) : (
+                        <g>
+                          <line x1="190" y1="80" x2="190" y2="340" stroke={showFischer3DWedges ? "#94a3b8" : (isDarkMode ? "#cbd5e1" : "#1e293b")} strokeWidth="4" strokeDasharray={showFischer3DWedges ? "6 4" : "none"} />
+                          <text x="190" y="70" fill="#f43f5e" fontSize="17" fontWeight="bold" textAnchor="middle">{chirality.top || 'C1 (Top)'}</text>
+
+                          {showFischer3DWedges ? (
+                            <>
+                              <polygon points="190,210 90,202 90,218" fill="#f59e0b" />
+                              <polygon points="190,210 290,202 290,218" fill="#f59e0b" />
+                            </>
+                          ) : (
+                            <line x1="90" y1="210" x2="290" y2="210" stroke="#f59e0b" strokeWidth="4.5" />
+                          )}
+                          <text x="75" y="216" fill="#ec4899" fontSize="16" fontWeight="bold" textAnchor="end">{chirality.center?.left || 'Left'}</text>
+                          <circle cx="190" cy="210" r="7" fill="#f59e0b" />
+                          <text x="190" y="198" fill="#f59e0b" fontSize="11" fontWeight="bold" textAnchor="middle">{chirality.center?.name || 'C*'}</text>
+                          <text x="305" y="216" fill="#38bdf8" fontSize="16" fontWeight="bold">{chirality.center?.right || 'Right'}</text>
+
+                          <text x="190" y="365" fill="#f43f5e" fontSize="17" fontWeight="bold" textAnchor="middle">{chirality.bottom || 'C3 (Bottom)'}</text>
+                        </g>
+                      )
+                    )}
+
                     {/* D-GLUCOSE FISCHER */}
                     {fischerPreset === 'glucose' && (
                       <g>
