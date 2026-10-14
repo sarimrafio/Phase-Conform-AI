@@ -1,5 +1,6 @@
 import { GoogleGenAI } from '@google/genai';
 import { NextResponse } from 'next/server';
+import { sanitizeScientificText } from '../../../utils/formatScientific';
 
 // In-memory cache for ultra-fast instant recall (0ms latency on repeated angles/molecules)
 const analysisCache = new Map();
@@ -78,7 +79,8 @@ Analyze the exact quantum chemical mechanics:
 1. σ → σ* hyperconjugative orbital stabilization vs. Pauli exchange repulsion between parallel filled orbitals.
 2. Steric van der Waals strain and spatial proximity of terminal groups.
 3. Molecular dipole vector summation and symmetry cancellation.
-Provide 2 to 3 concise, highly rigorous, scientific sentences explaining why this exact dihedral angle exhibits this energetic and physical behavior.`;
+Provide 2 to 3 concise, highly rigorous, scientific points explaining why this exact dihedral angle exhibits this energetic and physical behavior.
+FORMATTING: Write clean standard Unicode (σ, π, σ*, Å, °, →, Debye). DO NOT use LaTeX syntax or dollar signs ($...). If writing numbered points (1., 2., 3.), place each point on its own new line.`;
 
     // Prioritized fast models without bulky tools for ultra-low latency (<2s)
     const fastModels = [
@@ -101,7 +103,7 @@ Provide 2 to 3 concise, highly rigorous, scientific sentences explaining why thi
           model: m,
           contents: prompt,
           config: {
-            systemInstruction: "You are an elite computational quantum chemist. Deliver direct, rigorous, accurate, and concise physical chemistry explanations focusing on frontier molecular orbital theory, hyperconjugation (sigma to sigma*), Pauli exchange repulsion, and electrostatic dipoles.",
+            systemInstruction: "You are an elite computational quantum chemist. Deliver direct, rigorous, accurate, and concise physical chemistry explanations focusing on frontier molecular orbital theory, hyperconjugation (sigma to sigma*), Pauli exchange repulsion, and electrostatic dipoles. CRITICAL: Never output LaTeX syntax or dollar signs ($..., \\sigma, \\text{}, \\AA, 0^\\circ). Always use clean standard Unicode characters directly (σ, π, σ*, Å, °, →, Debye). Separate numbered points with double newlines.",
             temperature: 0.2,
           }
         });
@@ -114,7 +116,7 @@ Provide 2 to 3 concise, highly rigorous, scientific sentences explaining why thi
         clearTimeout(timeoutId);
 
         if (response && response.text) {
-          resultText = response.text.trim();
+          resultText = sanitizeScientificText(response.text.trim());
           selectedModel = m;
           break;
         }
@@ -126,7 +128,7 @@ Provide 2 to 3 concise, highly rigorous, scientific sentences explaining why thi
 
     // If all models failed (e.g. rate limit, network disruption), deliver our instant high-fidelity fallback
     if (!resultText) {
-      resultText = generateScientificFallback(details, roundedAngle, currentEnergy, liveDipole, clashData);
+      resultText = sanitizeScientificText(generateScientificFallback(details, roundedAngle, currentEnergy, liveDipole, clashData));
       selectedModel = "Phase-Conform Quantum Physics Engine";
     }
 

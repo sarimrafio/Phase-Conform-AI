@@ -1,5 +1,6 @@
 import { GoogleGenAI, Type } from '@google/genai';
 import { NextResponse } from 'next/server';
+import { sanitizeScientificText } from '../../../utils/formatScientific';
 
 function handleLocalFallback(message, state = null) {
   const lower = message.toLowerCase().trim();
@@ -651,7 +652,8 @@ ${telemetryContext}
 CRITICAL INSTRUCTIONS:
 1. AUTONOMOUS UI CONTROL: When the user asks you to load a molecule, rotate a bond, change temperature, switch render mode, toggle spin, change camera view, minimize panels, or open the sketcher, YOU MUST INVOKE THE RELEVANT TOOL. Do not just talk about doing it—execute it!
 2. RELATIVE ADJUSTMENTS: If the user asks to "rotate 30 degrees more" or "heat it up by 50 degrees", check the current live telemetry above, compute the new value, and call the tool with the result.
-3. PRECISE AND CONCISE: Answer scientific questions with high chemical accuracy (Pauli repulsion, hyperconjugation, dipole cancellation, Boltzmann populations) and keep responses concise and polished.`;
+3. PRECISE AND CONCISE: Answer scientific questions with high chemical accuracy (Pauli repulsion, hyperconjugation, dipole cancellation, Boltzmann populations) and keep responses concise and polished.
+4. NO RAW LATEX: Never use raw LaTeX math syntax ($..., \\sigma, \\text{}, \\AA, ^\\circ). Always write clean standard Unicode directly: σ, π, σ*, Å, °, →, ΔE, μ, kJ/mol, Debye.`;
 
     const contents = history ? history.map(msg => ({
       role: msg.role === 'user' ? 'user' : 'model',
@@ -722,13 +724,13 @@ CRITICAL INSTRUCTIONS:
         type: 'tool_call',
         functionName: call.name,
         args: call.args,
-        text: response.text || actionText
+        text: sanitizeScientificText(response.text || actionText)
       });
     }
 
     return NextResponse.json({
       type: 'text',
-      text: response.text
+      text: sanitizeScientificText(response.text)
     });
 
   } catch (error) {

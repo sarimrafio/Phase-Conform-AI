@@ -12,6 +12,7 @@ import { THEME_PALETTES, getActiveThemeConfig } from '../utils/themes';
 const KetcherDrawer = dynamic(() => import('../components/KetcherDrawer'), { ssr: false });
 const Notebook2DModal = dynamic(() => import('../components/Notebook2DModal'), { ssr: false });
 import CompoundSearchBar from '../components/CompoundSearchBar';
+import ScientificFormatter from '../components/ScientificFormatter';
 import { findBestSpellCorrection, fetchPubChemAutocomplete } from '../utils/compoundCatalog';
 
 const R = 0.008314; 
@@ -2325,14 +2326,14 @@ export default function PhaseConformDashboard() {
 
                 <div className="text-[11px] theme-text-sub leading-relaxed font-sans">
                   {copilotMode === 'simplified' ? (
-                    <p className="theme-card p-2 rounded-lg border theme-border theme-text-main shadow-sm">
-                      {aiCopilotInsight.simplified}
-                    </p>
+                    <div className="theme-card p-2 rounded-lg border theme-border theme-text-main shadow-sm">
+                      <ScientificFormatter text={aiCopilotInsight.simplified} isDarkMode={isDarkMode} />
+                    </div>
                   ) : (
                     <div className="space-y-2">
-                      <p className="theme-card p-2 rounded-lg border theme-border theme-text-main font-sans shadow-sm">
-                        {aiCopilotInsight.descriptive}
-                      </p>
+                      <div className="theme-card p-2 rounded-lg border theme-border theme-text-main font-sans shadow-sm">
+                        <ScientificFormatter text={aiCopilotInsight.descriptive} isDarkMode={isDarkMode} />
+                      </div>
 
                       {/* On-Demand Gemini Quantum Deep-Dive Option */}
                       <div className="flex items-center justify-between pt-0.5">
@@ -2389,7 +2390,7 @@ export default function PhaseConformDashboard() {
                             )}
                           </div>
                           <div className="font-sans leading-relaxed">
-                            {geminiDeepDive}
+                            <ScientificFormatter text={geminiDeepDive} isDarkMode={isDarkMode} />
                           </div>
                         </div>
                       )}
@@ -2700,7 +2701,7 @@ export default function PhaseConformDashboard() {
           <div className="flex-1 overflow-y-auto p-3 sm:p-4 flex flex-col gap-3 custom-scrollbar" ref={chatScrollRef}>
             {chatHistory.map((msg, i) => (
               <div key={i} className={`max-w-[85%] rounded-xl p-3 text-[11px] ${msg.role === 'user' ? (isDarkMode ? 'bg-indigo-500/30 text-indigo-100 self-end rounded-br-sm' : 'bg-indigo-600 text-white self-end rounded-br-sm shadow-sm') : 'theme-card theme-text-main border theme-border self-start rounded-bl-sm shadow-sm'}`}>
-                {msg.text}
+                <ScientificFormatter text={msg.text} isDarkMode={isDarkMode} />
               </div>
             ))}
             {isChatLoading && (
