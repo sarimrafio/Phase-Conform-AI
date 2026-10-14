@@ -5,7 +5,7 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, AreaChart,
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Sphere, Html } from '@react-three/drei';
 import * as THREE from 'three';
-import { Beaker, Activity, Hexagon, X, Zap, Brain, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, RotateCw, ZoomIn, ZoomOut, Mic, MicOff, Volume2, VolumeX, Palette, Sun, Moon, Maximize2, BookOpen, Layers, Sliders } from 'lucide-react';
+import { Beaker, Activity, Hexagon, X, Zap, Brain, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, RotateCw, ZoomIn, ZoomOut, Mic, MicOff, Volume2, VolumeX, Palette, Sun, Moon, Maximize2, BookOpen, Layers, Sliders, Compass } from 'lucide-react';
 import { THEME_PALETTES, getActiveThemeConfig } from '../utils/themes';
 
 // Dynamically import Ketcher & Notebook2DModal so they don't break Next.js SSR
@@ -13,6 +13,7 @@ const KetcherDrawer = dynamic(() => import('../components/KetcherDrawer'), { ssr
 const Notebook2DModal = dynamic(() => import('../components/Notebook2DModal'), { ssr: false });
 import CompoundSearchBar from '../components/CompoundSearchBar';
 import ScientificFormatter from '../components/ScientificFormatter';
+import OnboardingTutorial from '../components/OnboardingTutorial';
 import { findBestSpellCorrection, fetchPubChemAutocomplete } from '../utils/compoundCatalog';
 
 const R = 0.008314; 
@@ -501,6 +502,7 @@ export default function PhaseConformDashboard() {
   const [geminiDeepDive, setGeminiDeepDive] = useState(null);
   const [isDeepDiveLoading, setIsDeepDiveLoading] = useState(false);
   const [deepDiveMeta, setDeepDiveMeta] = useState(null);
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
 
   // Dynamic Theming State: 10 Popular Palettes with Dark & Light Mode
   const [themeId, setThemeId] = useState('midnight');
@@ -1688,6 +1690,16 @@ export default function PhaseConformDashboard() {
               )}
             </div>
 
+            {/* Interactive Guided Tour & New User Guide Button */}
+            <button 
+              onClick={() => setIsOnboardingOpen(true)}
+              className="flex items-center gap-1 p-1.5 px-2 rounded-lg text-xs font-bold border transition-all theme-sub theme-border hover:border-pink-500/40 text-pink-400 hover:text-pink-300 shadow-sm"
+              title="Interactive Beginner's Tutorial & User Guide"
+            >
+              <Compass className="w-3.5 h-3.5 text-pink-400" />
+              <span className="hidden sm:inline font-sans">Tour</span>
+            </button>
+
             {/* Quick Dark / Light Mode Switch */}
             <button 
               onClick={() => setIsDarkMode(!isDarkMode)}
@@ -1719,7 +1731,7 @@ export default function PhaseConformDashboard() {
         </div>
 
         {/* Row 2: Search Bar with Autocomplete & Typo Prediction + Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full" data-tour="search-bar">
           {/* Autocomplete & AI Typo-Correction Search Bar */}
           <CompoundSearchBar
             searchQuery={searchQuery}
@@ -1733,7 +1745,7 @@ export default function PhaseConformDashboard() {
           />
 
           {/* Action Buttons: Random, 2D Notebook, Draw */}
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar mobile-touch-scroll shrink-0 justify-end">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar mobile-touch-scroll shrink-0 justify-end" data-tour="notebook-draw">
             {/* Random Molecule Generator Button */}
             <button 
               onClick={loadRandomCompound} 
@@ -2094,7 +2106,7 @@ export default function PhaseConformDashboard() {
           </div>
 
           {/* 3D Canvas Container */}
-          <div className="flex-1 w-full min-h-[220px] sm:min-h-[280px] cursor-move z-0 relative touch-none">
+          <div className="flex-1 w-full min-h-[220px] sm:min-h-[280px] cursor-move z-0 relative touch-none" data-tour="canvas">
             {/* Quick-Access Floating Zoom & Spin HUD */}
             <div className="absolute top-3 right-3 z-20 flex flex-col gap-1 p-1 rounded-xl theme-panel backdrop-blur-md border theme-border shadow-lg">
               <button 
@@ -2237,7 +2249,7 @@ export default function PhaseConformDashboard() {
         }`}>
           
           {/* Panel 1: Main Dihedral Control */}
-          <div className="shrink-0 theme-panel backdrop-blur-xl rounded-2xl border theme-border p-3.5 shadow-xl relative">
+          <div className="shrink-0 theme-panel backdrop-blur-xl rounded-2xl border theme-border p-3.5 shadow-xl relative" data-tour="dihedral-controls">
             <div className="flex justify-between items-center mb-2">
               <h2 className={`text-xs font-bold ${isDarkMode ? 'text-indigo-300' : 'text-indigo-700 font-extrabold'} tracking-[0.2em] uppercase flex items-center gap-1.5`}>
                 Dihedral Angle Control
@@ -2278,7 +2290,7 @@ export default function PhaseConformDashboard() {
             </div>
 
             {/* Real-Time AI Conformation Copilot Banner */}
-            <div className="mt-2.5 pt-2 border-t theme-border flex items-start gap-2 theme-sub p-2.5 rounded-xl border shadow-inner">
+            <div className="mt-2.5 pt-2 border-t theme-border flex items-start gap-2 theme-sub p-2.5 rounded-xl border shadow-inner" data-tour="quantum-copilot">
               <div className="p-1 rounded-lg bg-pink-500/10 border border-pink-500/30 shrink-0 mt-0.5">
                 <Zap className={`w-3.5 h-3.5 ${isDarkMode ? 'text-pink-400' : 'text-pink-600'} animate-pulse`} />
               </div>
@@ -2402,7 +2414,7 @@ export default function PhaseConformDashboard() {
           </div>
 
           {/* Panel 2: Energy Surface & Boltzmann (Compact length) */}
-          <div className="shrink-0 h-[210px] theme-panel backdrop-blur-xl rounded-2xl border theme-border p-3 shadow-xl relative overflow-hidden group flex flex-col">
+          <div className="shrink-0 h-[210px] theme-panel backdrop-blur-xl rounded-2xl border theme-border p-3 shadow-xl relative overflow-hidden group flex flex-col" data-tour="energy-chart">
             <div className="absolute inset-0 bg-gradient-to-br from-indigo-300/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
             
             <div className="flex justify-between items-center mb-1 shrink-0">
@@ -2743,6 +2755,7 @@ export default function PhaseConformDashboard() {
         
         {/* Chat Toggle Button */}
         <button 
+          data-tour="gemini-copilot"
           onClick={() => setChatOpen(!chatOpen)}
           className={`absolute bottom-0 right-0 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-[0_0_30px_rgba(244,114,182,0.4)] flex items-center justify-center transition-transform hover:scale-110 active:scale-95 group ${chatOpen ? 'scale-0 opacity-0 pointer-events-none' : 'scale-100 opacity-100'}`}
           title="Open Gemini 3.8 Flash AI Co-Pilot Assistant"
@@ -2754,6 +2767,17 @@ export default function PhaseConformDashboard() {
           </span>
         </button>
       </div>
+
+      {/* Interactive Hands-On Onboarding Tutorial & User Choice Modal */}
+      <OnboardingTutorial 
+        isOpen={isOnboardingOpen}
+        onClose={() => setIsOnboardingOpen(false)}
+        isDarkMode={isDarkMode}
+        currentTheme={currentTheme}
+        onSelectAngle={(val) => setAngle(val)}
+        onOpenNotebook={() => setIsNotebook2DOpen(true)}
+        onOpenChat={() => setChatOpen(true)}
+      />
 
     </div>
   );
