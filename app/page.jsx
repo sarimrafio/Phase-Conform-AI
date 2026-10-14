@@ -11,6 +11,8 @@ import { THEME_PALETTES, getActiveThemeConfig } from '../utils/themes';
 // Dynamically import Ketcher & Notebook2DModal so they don't break Next.js SSR
 const KetcherDrawer = dynamic(() => import('../components/KetcherDrawer'), { ssr: false });
 const Notebook2DModal = dynamic(() => import('../components/Notebook2DModal'), { ssr: false });
+import CompoundSearchBar from '../components/CompoundSearchBar';
+import { findBestSpellCorrection, fetchPubChemAutocomplete } from '../utils/compoundCatalog';
 
 const R = 0.008314; 
 const getBackendUrl = () => {
@@ -489,6 +491,7 @@ export default function PhaseConformDashboard() {
   const [isAnimatingCamera, setIsAnimatingCamera] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [correctionNotice, setCorrectionNotice] = useState(null);
   const [aiMetrics, setAiMetrics] = useState(null);
   const [showDipole, setShowDipole] = useState(true);
   const [isAiMetricsMinimized, setIsAiMetricsMinimized] = useState(false);
@@ -990,11 +993,25 @@ export default function PhaseConformDashboard() {
     fetchMoleculeData(moleculeData.smiles, [startIdx, endIdx]);
   };
 
-  const searchCompound = async (query) => {
-    const raw = query.trim();
+  const searchCompound = async (queryOrSmiles, explicitName = null) => {
+    const raw = (queryOrSmiles || "").trim();
     if (!raw) return;
     setIsSearching(true);
     setErrorMsg("");
+
+    // If explicitName is passed (e.g. from suggestion click: onSearch(smiles, name))
+    if (explicitName) {
+      setSearchQuery(explicitName);
+      setCorrectionNotice(null);
+      try {
+        await fetchMoleculeData(raw);
+      } catch (err) {
+        setErrorMsg(`Failed to load molecule: ${err.message}`);
+      } finally {
+        setIsSearching(false);
+      }
+      return;
+    }
     
     // Normalization & formula checks
     const upper = raw.toUpperCase();
@@ -1022,12 +1039,24 @@ export default function PhaseConformDashboard() {
       'CAFFEINE': 'CN1C=NC2=C1C(=O)N(C(=O)N2C)C',
       'GLUCOSE': 'OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O',
       'IBUPROFEN': 'CC(C)Cc1ccc(cc1)C(C)C(=O)O',
-      'CYCLOHEXANE': 'C1CCCCC1'
+      'CYCLOHEXANE': 'C1CCCCC1',
+      'PARACETAMOL': 'CC(=O)Nc1ccc(O)cc1',
+      'DOPAMINE': 'c1cc(c(cc1CCN)O)O',
+      'SEROTONIN': 'c1cc2c(cc1O)[nH]cc2CCN',
+      'ADRENALINE': 'CNC[C@H](c1ccc(c(c1)O)O)O',
+      'EPINEPHRINE': 'CNC[C@H](c1ccc(c(c1)O)O)O',
+      'MELATONIN': 'CC(=O)NCCc1c[nH]c2ccc(OC)cc12',
+      'CHOLESTEROL': 'CC(C)CCCC(C)C1CCC2C1(CCC3C2CC=C4C3(CCC(C4)O)C)C',
+      'TESTOSTERONE': 'CC12CCC3C(C1CCC2O)CCC4=CC(=O)CCC34C',
+      'BENZENE': 'c1ccccc1',
+      'ETHANOL': 'CCO',
+      'METHANE': 'C'
     };
 
     if (formulaMap[formulaClean] || formulaMap[upper]) {
       const smiles = formulaMap[formulaClean] || formulaMap[upper];
       setSearchQuery(raw);
+      setCorrectionNotice(null);
       try {
         await fetchMoleculeData(smiles);
       } catch (err) {
@@ -1043,14 +1072,29 @@ export default function PhaseConformDashboard() {
       try {
         await fetchMoleculeData(raw);
         setSearchQuery(raw);
+        setCorrectionNotice(null);
         setIsSearching(false);
         return;
       } catch (smilesErr) {
-        // Fall back to PubChem search below
+        // Fall back to spell check / PubChem below
       }
     }
 
-    // 3. PubChem Chemical Formula Search (e.g. C4H10, C6H6, C9H8O4, etc.)
+    // 3. AI / Fuzzy Spell Correction Check (Detect & Correct typos like 'caffiene', 'asprin', 'dopamin')
+    const spellCheck = findBestSpellCorrection(raw);
+    if (spellCheck && spellCheck.confidence >= 70) {
+      setCorrectionNotice(`✨ Auto-corrected "${raw}" to ${spellCheck.correctedName} (${spellCheck.confidence}%)`);
+      setSearchQuery(spellCheck.correctedName);
+      try {
+        await fetchMoleculeData(spellCheck.smiles);
+        setIsSearching(false);
+        return;
+      } catch (err) {
+        // Fall back to online search
+      }
+    }
+
+    // 4. PubChem Chemical Formula Search (e.g. C4H10, C6H6, C9H8O4, etc.)
     const isFormula = /^[A-Z][a-z]?\d*([A-Z][a-z]?\d*)*$/.test(formulaClean) && /\d/.test(formulaClean);
     let smilesToFetch = "";
 
@@ -1067,7 +1111,7 @@ export default function PhaseConformDashboard() {
       }
     }
 
-    // 4. PubChem Compound Name Search (fallback)
+    // 5. PubChem Compound Name Search (fallback)
     if (!smilesToFetch) {
       try {
         const res = await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(raw)}/property/IsomericSMILES,CanonicalSMILES/JSON`);
@@ -1081,8 +1125,31 @@ export default function PhaseConformDashboard() {
       }
     }
 
+    // 6. If exact PubChem name failed, try PubChem Autocomplete to rescue near misses
+    if (!smilesToFetch && raw.length >= 3) {
+      try {
+        const autoResults = await fetchPubChemAutocomplete(raw, 1);
+        if (autoResults && autoResults.length > 0) {
+          const suggested = autoResults[0].name;
+          const aRes = await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(suggested)}/property/IsomericSMILES,CanonicalSMILES/JSON`);
+          if (aRes.ok) {
+            const aData = await aRes.json();
+            const aProps = aData.PropertyTable?.Properties[0];
+            smilesToFetch = aProps?.IsomericSMILES || aProps?.CanonicalSMILES || aProps?.SMILES;
+            if (smilesToFetch) {
+              setCorrectionNotice(`✨ Matched "${raw}" to ${suggested}`);
+              setSearchQuery(suggested);
+            }
+          }
+        }
+      } catch (autoErr) {
+        // Handled below
+      }
+    }
+
     if (!smilesToFetch) {
-      setErrorMsg(`Formula or compound '${raw}' not found in database. Try SMILES (e.g. CCCC) or formula (e.g. C4H10).`);
+      const hint = spellCheck ? ` Did you mean "${spellCheck.correctedName}"?` : '';
+      setErrorMsg(`Formula or compound '${raw}' not found.${hint} Try SMILES (e.g. CCCC) or formula (e.g. C4H10).`);
       setIsSearching(false);
       return;
     }
@@ -1650,57 +1717,52 @@ export default function PhaseConformDashboard() {
           </div>
         </div>
 
-        {/* Row 2: Search Input + Action Buttons (2D Notebook, Draw, Random) */}
-        <div className="flex items-center gap-1.5 w-full overflow-x-auto no-scrollbar mobile-touch-scroll">
-          {/* Option to Write Chemical Formula / Name / SMILES */}
-          <div className="flex items-center gap-1.5 theme-sub p-1 rounded-lg border theme-border flex-1 min-w-[130px]">
-            <input 
-              type="text" 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && searchCompound(searchQuery)}
-              placeholder="Formula (C4H10) or compound..."
-              className="bg-transparent theme-text-primary text-xs px-2 py-1 rounded outline-none w-full min-w-0 placeholder-indigo-300/40"
-            />
+        {/* Row 2: Search Bar with Autocomplete & Typo Prediction + Action Buttons */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full">
+          {/* Autocomplete & AI Typo-Correction Search Bar */}
+          <CompoundSearchBar
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            onSearch={(queryOrSmiles, explicitName) => searchCompound(queryOrSmiles, explicitName)}
+            isSearching={isSearching}
+            isDarkMode={isDarkMode}
+            currentTheme={currentTheme}
+            correctionNotice={correctionNotice}
+            setCorrectionNotice={setCorrectionNotice}
+          />
+
+          {/* Action Buttons: Random, 2D Notebook, Draw */}
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar mobile-touch-scroll shrink-0 justify-end">
+            {/* Random Molecule Generator Button */}
             <button 
-              onClick={() => searchCompound(searchQuery)}
-              disabled={isSearching}
-              className="bg-gradient-to-r from-indigo-500 to-pink-500 hover:from-indigo-400 hover:to-pink-400 text-white font-bold px-2.5 py-1 rounded text-xs transition-colors flex items-center gap-1 shrink-0"
-              title="Load Chemical Formula or Compound"
+              onClick={loadRandomCompound} 
+              className="text-xs font-bold theme-sub hover:opacity-80 theme-border border px-2.5 py-1.5 rounded-lg transition-all text-center uppercase tracking-wider shrink-0 flex items-center gap-1 shadow-sm active:scale-95"
+              title="Generate Random Molecule (Alkane, Cycloalkane, Bioactive, Chiral)"
             >
-              {isSearching ? '...' : 'Load'}
+              <span className="text-sm">🎲</span>
+              <span className="hidden sm:inline">Random</span>
+            </button>
+
+            {/* 2D Notebook Structure Button */}
+            <button 
+              onClick={() => setIsNotebook2DOpen(true)}
+              className="flex items-center gap-1 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold shadow-md shadow-purple-500/20 transition-all shrink-0 active:scale-95"
+              title="Open 2D Skeletal & Newman Projection Lab Notebook View"
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>2D</span>
+              <span className="hidden sm:inline">Notebook</span>
+            </button>
+
+            {/* Draw Button */}
+            <button 
+              onClick={() => setIsDrawing(true)}
+              className="flex items-center gap-1 bg-gradient-to-r from-indigo-400 to-purple-400 hover:from-indigo-500 hover:to-purple-500 text-white px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold shadow-md shadow-indigo-500/20 transition-all shrink-0 active:scale-95"
+            >
+              <Beaker className="w-3.5 h-3.5" />
+              <span>Draw</span>
             </button>
           </div>
-
-          {/* Random Molecule Generator Button */}
-          <button 
-            onClick={loadRandomCompound} 
-            className="text-xs font-bold theme-sub hover:opacity-80 theme-border border px-2.5 py-1.5 rounded-lg transition-all text-center uppercase tracking-wider shrink-0 flex items-center gap-1 shadow-sm active:scale-95"
-            title="Generate Random Molecule (Alkane, Cycloalkane, Bioactive, Chiral)"
-          >
-            <span className="text-sm">🎲</span>
-            <span className="hidden sm:inline">Random</span>
-          </button>
-
-          {/* 2D Notebook Structure Button */}
-          <button 
-            onClick={() => setIsNotebook2DOpen(true)}
-            className="flex items-center gap-1 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold shadow-md shadow-purple-500/20 transition-all shrink-0 active:scale-95"
-            title="Open 2D Skeletal & Newman Projection Lab Notebook View"
-          >
-            <BookOpen className="w-3.5 h-3.5" />
-            <span>2D</span>
-            <span className="hidden sm:inline">Notebook</span>
-          </button>
-
-          {/* Draw Button */}
-          <button 
-            onClick={() => setIsDrawing(true)}
-            className="flex items-center gap-1 bg-gradient-to-r from-indigo-400 to-purple-400 hover:from-indigo-500 hover:to-purple-500 text-white px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold shadow-md shadow-indigo-500/20 transition-all shrink-0 active:scale-95"
-          >
-            <Beaker className="w-3.5 h-3.5" />
-            <span>Draw</span>
-          </button>
         </div>
       </header>
 
