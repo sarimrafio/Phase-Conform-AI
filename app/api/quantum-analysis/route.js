@@ -82,12 +82,13 @@ Analyze the exact quantum chemical mechanics:
 Provide 2 to 3 concise, highly rigorous, scientific points explaining why this exact dihedral angle exhibits this energetic and physical behavior.
 FORMATTING: Write clean standard Unicode (σ, π, σ*, Å, °, →, Debye). DO NOT use LaTeX syntax or dollar signs ($...). If writing numbered points (1., 2., 3.), place each point on its own new line.`;
 
-    // Prioritized fast models without bulky tools for ultra-low latency (<2s)
+    // Prioritized fast models with Gemini 3.8 Flash leading for ultra-accurate quantum insight
     const fastModels = [
+      'gemini-3.8-flash',
+      'gemini-3.5-flash',
       'gemini-3.5-flash-lite',
       'gemini-3.1-flash-lite',
-      'gemini-flash-lite-latest',
-      'gemini-3.5-flash'
+      'gemini-flash-lite-latest'
     ];
 
     let resultText = null;

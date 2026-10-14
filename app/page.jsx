@@ -875,7 +875,7 @@ export default function PhaseConformDashboard() {
       if (data.text) {
         setGeminiDeepDive(data.text);
         setDeepDiveMeta({
-          model: data.model || 'Gemini 3.5 Flash',
+          model: data.model || 'Gemini 3.8 Flash',
           latencyMs: data.latencyMs,
           cached: data.cached
         });
@@ -1710,10 +1710,10 @@ export default function PhaseConformDashboard() {
                   ? 'bg-pink-500 text-white border-pink-400 shadow-[0_0_15px_rgba(244,114,182,0.4)]' 
                   : 'bg-gradient-to-r from-pink-500/20 to-purple-500/20 hover:from-pink-500/30 hover:to-purple-500/30 text-pink-400 border-pink-500/30'
               }`}
-              title="Toggle Gemini AI Co-Pilot Assistant"
+              title="Toggle Gemini 3.8 Flash AI Co-Pilot Assistant"
             >
               <Zap className="w-3.5 h-3.5 text-pink-400 animate-pulse" />
-              <span className="hidden xs:inline">Gemini</span>
+              <span className="hidden xs:inline">Gemini 3.8</span>
             </button>
           </div>
         </div>
@@ -2341,10 +2341,10 @@ export default function PhaseConformDashboard() {
                           onClick={handleRequestDeepDive}
                           disabled={isDeepDiveLoading}
                           className={`flex items-center gap-1.5 text-[10px] font-bold ${isDarkMode ? 'text-purple-300 bg-purple-500/20 hover:bg-purple-500/30 border-purple-500/30' : 'text-purple-700 bg-purple-100 hover:bg-purple-200 border-purple-300'} px-2 py-1 rounded-md transition-all border disabled:opacity-50`}
-                          title="Generate a custom quantum chemical deep dive from Gemini 3.5 Flash"
+                          title="Generate a custom quantum chemical deep dive from Gemini 3.8 Flash"
                         >
                           <Zap className={`w-3 h-3 ${isDarkMode ? 'text-purple-400' : 'text-purple-600'} ${isDeepDiveLoading ? 'animate-spin' : ''}`} />
-                          {isDeepDiveLoading ? "Computing with Gemini 3.5..." : "Ask Gemini AI Quantum Deep-Dive"}
+                          {isDeepDiveLoading ? "Computing with Gemini 3.8..." : "Ask Gemini 3.8 Flash Quantum Deep-Dive"}
                         </button>
                         {geminiDeepDive && (
                           <button 
@@ -2362,7 +2362,7 @@ export default function PhaseConformDashboard() {
                           <div className="flex items-center justify-between">
                             <span className={`text-[9.5px] font-bold uppercase tracking-wider ${isDarkMode ? 'text-purple-400' : 'text-purple-700'} flex items-center gap-1.5`}>
                               <Zap className="w-3.5 h-3.5 text-purple-500 animate-bounce" />
-                              Gemini 3.5 Flash Orbital Analysis
+                              Gemini 3.8 Flash Orbital Analysis
                             </span>
                             <span className="text-[9px] text-purple-400 font-mono animate-pulse">Evaluating orbitals...</span>
                           </div>
@@ -2381,7 +2381,7 @@ export default function PhaseConformDashboard() {
                           <div className="flex items-center justify-between">
                             <span className={`text-[9.5px] font-bold uppercase tracking-wider ${isDarkMode ? 'text-purple-400' : 'text-purple-700'} flex items-center gap-1.5`}>
                               <Zap className="w-3 h-3 text-purple-500" />
-                              Gemini 3.5 Flash Quantum Conformation Analysis:
+                              Gemini 3.8 Flash Quantum Conformation Analysis:
                             </span>
                             {deepDiveMeta && (
                               <span className={`text-[8.5px] font-mono px-1.5 py-0.5 rounded border ${isDarkMode ? 'bg-purple-950/60 border-purple-800/40 text-purple-300' : 'bg-purple-50 border-purple-200 text-purple-700'}`}>
@@ -2678,7 +2678,7 @@ export default function PhaseConformDashboard() {
           <div className={`bg-gradient-to-r ${isDarkMode ? 'from-pink-500/20 to-purple-500/20 border-pink-500/20' : 'from-pink-100 to-purple-100 border-pink-200'} border-b p-3 flex justify-between items-center`}>
             <h3 className={`text-xs font-bold ${isDarkMode ? 'text-pink-300' : 'text-pink-700 font-extrabold'} tracking-[0.1em] flex items-center gap-2`}>
               <Zap className="w-3 h-3 text-pink-500" />
-              Gemini Pro Co-Pilot
+              Gemini 3.8 Flash Co-Pilot
             </h3>
             <div className="flex items-center gap-2">
               <button 
@@ -2745,7 +2745,7 @@ export default function PhaseConformDashboard() {
         <button 
           onClick={() => setChatOpen(!chatOpen)}
           className={`absolute bottom-0 right-0 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-[0_0_30px_rgba(244,114,182,0.4)] flex items-center justify-center transition-transform hover:scale-110 active:scale-95 group ${chatOpen ? 'scale-0 opacity-0 pointer-events-none' : 'scale-100 opacity-100'}`}
-          title="Open Gemini AI Co-Pilot Assistant"
+          title="Open Gemini 3.8 Flash AI Co-Pilot Assistant"
         >
           <Zap className="w-5 h-5 sm:w-6 sm:h-6 animate-pulse" />
           <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
