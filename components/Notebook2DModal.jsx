@@ -562,9 +562,9 @@ CONFORMATION & STEREOCENTER SUMMARY:
   const pubchemPngUrl = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/${encodeURIComponent(smiles)}/PNG`;
 
   return (
-    <div className="fixed inset-0 z-[110] bg-black/70 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 lg:p-6 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[110] bg-black/70 backdrop-blur-md flex items-center justify-center p-1.5 sm:p-4 lg:p-6 animate-in fade-in duration-200">
       <div 
-        className={`w-full max-w-5xl max-h-[94vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col border transition-all duration-300 relative ${
+        className={`w-full max-w-5xl h-[95dvh] max-h-[96dvh] sm:h-auto sm:max-h-[94vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col border transition-all duration-300 relative ${
           isDarkMode ? 'bg-[#181825] border-indigo-500/30 text-slate-100' : 'bg-white border-slate-300 text-slate-900'
         }`}
       >
@@ -603,10 +603,10 @@ CONFORMATION & STEREOCENTER SUMMARY:
         </div>
 
         {/* Tab Controls Bar */}
-        <div className={`px-2.5 sm:px-3 py-1.5 sm:py-2 border-b flex items-center justify-between gap-2 shrink-0 overflow-x-auto ${
+        <div className={`px-2 sm:px-3 py-1.5 sm:py-2 border-b flex items-center justify-between gap-1.5 shrink-0 overflow-x-auto no-scrollbar mobile-touch-scroll ${
           isDarkMode ? 'bg-[#161626] border-white/5' : 'bg-slate-100/70 border-slate-200'
         }`}>
-          <div className="flex items-center gap-1 p-0.5 sm:p-1 rounded-xl bg-black/20 border border-white/5 overflow-x-auto custom-scrollbar max-w-full">
+          <div className="flex items-center gap-1 p-0.5 sm:p-1 rounded-xl bg-black/20 border border-white/5 overflow-x-auto no-scrollbar mobile-touch-scroll max-w-full flex-nowrap shrink-0">
             <button
               onClick={() => setActiveTab('skeletal')}
               className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 ${
@@ -683,7 +683,7 @@ CONFORMATION & STEREOCENTER SUMMARY:
         </div>
 
         {/* Modal Main Content Area */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-6 custom-scrollbar">
           
           {/* TAB 1: 2D SKELETAL BOND-LINE FORMULA */}
           {activeTab === 'skeletal' && (
@@ -1109,8 +1109,8 @@ CONFORMATION & STEREOCENTER SUMMARY:
               )}
 
               {/* Conformation Selector Bar */}
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-1.5 p-1 rounded-xl bg-black/20 border border-white/5 overflow-x-auto">
+              <div className="flex flex-wrap items-center justify-between gap-2.5 sm:gap-3">
+                <div className="flex items-center gap-1.5 p-1 rounded-xl bg-black/20 border border-white/5 overflow-x-auto no-scrollbar mobile-touch-scroll max-w-full flex-nowrap shrink-0">
                   {[
                     { id: 'chair1', label: '🪑 Chair 1', deltaE: '0.0 kJ/mol' },
                     { id: 'chair2', label: '🔄 Flipped Chair 2', deltaE: ringAnalysis.aValue > 0 ? `+${ringAnalysis.aValue} kJ/mol` : '0.0 kJ/mol' },
@@ -1593,8 +1593,8 @@ CONFORMATION & STEREOCENTER SUMMARY:
               )}
 
               {/* Fischer Molecule Presets & Toggle Bar */}
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-1.5 p-1 rounded-xl bg-black/20 border border-white/5 overflow-x-auto">
+              <div className="flex flex-wrap items-center justify-between gap-2.5 sm:gap-3">
+                <div className="flex items-center gap-1.5 p-1 rounded-xl bg-black/20 border border-white/5 overflow-x-auto no-scrollbar mobile-touch-scroll max-w-full flex-nowrap shrink-0">
                   {chirality.isChiral && (
                     <button
                       onClick={() => setFischerPreset('active')}

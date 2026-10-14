@@ -5,6 +5,14 @@ export const metadata = {
   description: 'AI-Driven Geometry & Energy Engine',
 }
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: 'cover',
+  themeColor: '#141423',
+}
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
