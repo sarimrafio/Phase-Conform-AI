@@ -5,7 +5,7 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, AreaChart,
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Sphere, Html } from '@react-three/drei';
 import * as THREE from 'three';
-import { Beaker, Activity, Hexagon, X, Zap, Brain, ChevronDown, ChevronUp, Mic, MicOff, Volume2, VolumeX, Palette, Sun, Moon, Maximize2, BookOpen, Layers, Sliders } from 'lucide-react';
+import { Beaker, Activity, Hexagon, X, Zap, Brain, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, RotateCw, ZoomIn, ZoomOut, Mic, MicOff, Volume2, VolumeX, Palette, Sun, Moon, Maximize2, BookOpen, Layers, Sliders } from 'lucide-react';
 import * as ort from 'onnxruntime-web';
 import { THEME_PALETTES, getActiveThemeConfig } from '../utils/themes';
 
@@ -504,6 +504,22 @@ export default function PhaseConformDashboard() {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isThemePickerOpen, setIsThemePickerOpen] = useState(false);
   const themePickerRef = useRef(null);
+  const toolbarRef = useRef(null);
+
+  const handleToolbarWheel = (e) => {
+    if (toolbarRef.current) {
+      if (e.deltaY !== 0) {
+        toolbarRef.current.scrollLeft += e.deltaY;
+      }
+    }
+  };
+
+  const scrollToolbar = (direction) => {
+    if (toolbarRef.current) {
+      const amount = direction === 'left' ? -240 : 240;
+      toolbarRef.current.scrollBy({ left: amount, behavior: 'smooth' });
+    }
+  };
 
   // Close theme picker when clicking outside
   useEffect(() => {
@@ -1872,113 +1888,195 @@ export default function PhaseConformDashboard() {
               )}
             </div>
 
-            {/* Row 3: Render Modes, Camera Presets & Cinematic Controls - Horizontally scrollable on mobile */}
-            <div className="flex items-center gap-2 pt-1.5 border-t theme-border overflow-x-auto no-scrollbar mobile-touch-scroll shrink-0 -mx-1 px-1">
-              {/* Render Modes: Ball & Stick, Space-Filling, Wireframe, ESP Heatmap */}
-              <div className="flex items-center gap-0.5 sm:gap-1 theme-card p-0.5 rounded-lg border theme-border shadow-inner shrink-0">
-                {[
-                  ['ball-stick', 'Ball & Stick', 'bg-indigo-500 text-white shadow-sm'],
-                  ['vdw', 'Space-Filling', 'bg-purple-500 text-white shadow-sm'],
-                  ['wireframe', 'Wireframe', 'bg-teal-500 text-white shadow-sm'],
-                  ['esp', 'ESP Heatmap', 'bg-rose-500 text-white shadow-sm'],
-                ].map(([mode, label, activeClass]) => (
-                  <button
-                    key={mode}
-                    onClick={() => setRenderMode(mode)}
-                    className={`text-[10px] sm:text-xs px-2 sm:px-2.5 py-1 rounded-md font-bold uppercase tracking-wider transition-all border shrink-0 ${
-                      renderMode === mode 
-                        ? `${activeClass} border-transparent` 
-                        : 'theme-text-sub border-transparent hover:theme-text-main hover:opacity-80'
-                    }`}
-                  >
-                    {label}
+            {/* Row 3: Render Modes, Camera Presets & Controls with Left/Right Scroll Wheel & Buttons */}
+            <div className="relative flex items-center pt-1.5 border-t theme-border shrink-0 -mx-1 px-1">
+              {/* Left Scroll Button */}
+              <button 
+                type="button"
+                onClick={() => scrollToolbar('left')}
+                className="shrink-0 p-1 sm:p-1.5 rounded-lg theme-card border theme-border hover:opacity-100 opacity-70 hover:scale-105 active:scale-95 transition-all mr-1 shadow-sm flex items-center justify-center text-slate-300"
+                title="Scroll Left (or use mouse scroll wheel)"
+                aria-label="Scroll options left"
+              >
+                <ChevronLeft className="w-3.5 h-3.5" />
+              </button>
+
+              {/* Horizontally Scrollable Track (Mouse wheel & touch swipe enabled) */}
+              <div 
+                ref={toolbarRef}
+                onWheel={handleToolbarWheel}
+                className="flex-1 flex items-center gap-2 overflow-x-auto no-scrollbar mobile-touch-scroll scroll-smooth py-0.5"
+              >
+                {/* Render Modes: Ball & Stick, Space-Filling, Wireframe, ESP Heatmap */}
+                <div className="flex items-center gap-0.5 sm:gap-1 theme-card p-0.5 rounded-lg border theme-border shadow-inner shrink-0">
+                  {[
+                    ['ball-stick', 'Ball & Stick', 'bg-indigo-500 text-white shadow-sm'],
+                    ['vdw', 'Space-Filling', 'bg-purple-500 text-white shadow-sm'],
+                    ['wireframe', 'Wireframe', 'bg-teal-500 text-white shadow-sm'],
+                    ['esp', 'ESP Heatmap', 'bg-rose-500 text-white shadow-sm'],
+                  ].map(([mode, label, activeClass]) => (
+                    <button
+                      key={mode}
+                      onClick={() => setRenderMode(mode)}
+                      className={`text-[10px] sm:text-xs px-2 sm:px-2.5 py-1 rounded-md font-bold uppercase tracking-wider transition-all border shrink-0 ${
+                        renderMode === mode 
+                          ? `${activeClass} border-transparent` 
+                          : 'theme-text-sub border-transparent hover:theme-text-main hover:opacity-80'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Camera Angle Presets */}
+                <div className="flex items-center gap-1 shrink-0">
+                  <span className="text-[10px] font-bold theme-text-muted uppercase tracking-widest mr-0.5 hidden sm:inline">Cam:</span>
+                  <button onClick={() => fitModelToWindow('front')} className="text-[11px] sm:text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-1.5 sm:px-2 py-1 rounded-lg transition-all font-medium shrink-0" title="Front Projection (Auto-fitted)">
+                    Front
                   </button>
-                ))}
+                  <button onClick={() => fitModelToWindow('chair')} className="text-[11px] sm:text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-1.5 sm:px-2 py-1 rounded-lg transition-all font-medium shrink-0" title="Isometric Chair View (Auto-fitted)">
+                    Iso Chair
+                  </button>
+                  <button onClick={() => fitModelToWindow('haworth')} className="text-[11px] sm:text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-1.5 sm:px-2 py-1 rounded-lg transition-all font-medium shrink-0" title="Haworth Ring Projection (Auto-fitted)">
+                    Haworth
+                  </button>
+                  <button onClick={() => fitModelToWindow('fischer')} className="text-[11px] sm:text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-1.5 sm:px-2 py-1 rounded-lg transition-all font-medium shrink-0" title="Fischer / Newman Axial View (Auto-fitted)">
+                    Fischer
+                  </button>
+                </div>
+
+                {/* Cinematic Controls & Dipole Toggle */}
+                <div className="flex items-center gap-1 shrink-0">
+                  {/* 2D Notebook Structure Button */}
+                  <button 
+                    onClick={() => setIsNotebook2DOpen(true)} 
+                    className={`text-[11px] sm:text-xs px-2 sm:px-2.5 py-1 rounded-lg font-bold transition-all border flex items-center gap-1.5 shadow-sm shrink-0 ${
+                      isDarkMode 
+                        ? 'bg-purple-500/20 text-purple-300 border-purple-400/40 hover:bg-purple-500/30 hover:text-white' 
+                        : 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100 hover:text-purple-900'
+                    }`}
+                    title="Open 2D Skeletal & Newman Projection Lab Notebook View"
+                  >
+                    <BookOpen className="w-3.5 h-3.5 text-purple-500" />
+                    <span>2D Notebook</span>
+                  </button>
+
+                  {/* Perfect Fit to Window Button */}
+                  <button 
+                    onClick={() => fitModelToWindow('current')} 
+                    className={`text-[11px] sm:text-xs px-2 sm:px-2.5 py-1 rounded-lg font-bold transition-all border flex items-center gap-1 shadow-sm shrink-0 ${
+                      isDarkMode 
+                        ? 'bg-indigo-500/20 text-indigo-300 border-indigo-400/40 hover:bg-indigo-500/30 hover:text-white' 
+                        : 'bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 hover:text-indigo-900'
+                    }`}
+                    title="Fit whole 3D model perfectly within visible window (Hotkey: F)"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5 text-indigo-500" />
+                    <span className="hidden sm:inline">Fit View</span>
+                  </button>
+                  <button onClick={handleZoomIn} className="text-[11px] sm:text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-1.5 sm:px-2 py-1 rounded-lg font-bold transition-all shrink-0" title="Zoom In (+)">
+                    +
+                  </button>
+                  <button onClick={handleZoomOut} className="text-[11px] sm:text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-1.5 sm:px-2 py-1 rounded-lg font-bold transition-all shrink-0" title="Zoom Out (-)">
+                    -
+                  </button>
+                  <button 
+                    onClick={() => setIsAutoRotatingMolecule(!isAutoRotatingMolecule)} 
+                    className={`text-[11px] sm:text-xs px-2 sm:px-2.5 py-1 rounded-lg transition-all font-bold border shrink-0 ${isAutoRotatingMolecule ? 'bg-pink-500 text-white border-pink-400 shadow-sm' : 'theme-card hover:opacity-80 theme-text-main border theme-border'}`}
+                    title={isAutoRotatingMolecule ? "Stop Molecule Rotation" : "Auto-Rotate Molecule in 3D"}
+                  >
+                    {isAutoRotatingMolecule ? '⏹ Spin' : '▶ Spin'}
+                  </button>
+                  <button 
+                    onClick={() => setIsAutoRotatingBond(!isAutoRotatingBond)} 
+                    disabled={!moleculeData?.active_bond}
+                    className={`text-[11px] sm:text-xs px-2 sm:px-2.5 py-1 rounded-lg transition-all font-bold border shrink-0 ${!moleculeData?.active_bond ? 'opacity-40 cursor-not-allowed theme-card text-slate-400 border theme-border' : (isAutoRotatingBond ? 'bg-teal-500 text-white border-teal-400 shadow-sm' : 'theme-card hover:opacity-80 theme-text-main border theme-border')}`}
+                    title={isAutoRotatingBond ? "Stop Bond Rotation" : "Auto-Rotate Active Dihedral Bond"}
+                  >
+                    {isAutoRotatingBond ? '⏹ Bond' : '▶ Bond'}
+                  </button>
+                  <button 
+                    onClick={() => setShowDipole(!showDipole)} 
+                    className={`text-[11px] sm:text-xs px-2 sm:px-2.5 py-1 rounded-lg transition-all font-bold border flex items-center gap-1 shrink-0 ${
+                      showDipole 
+                        ? (isDarkMode ? 'bg-sky-500/20 text-sky-300 border-sky-400/50 shadow-[0_0_12px_rgba(56,189,248,0.3)]' : 'bg-sky-100 text-sky-700 border-sky-300 shadow-sm font-bold') 
+                        : 'theme-card hover:opacity-80 theme-text-main border theme-border'
+                    }`}
+                    title="Toggle 3D Live AI Dipole Vector"
+                  >
+                    <Zap className={`w-3 h-3 ${isDarkMode ? 'text-sky-400' : 'text-sky-600'}`} />
+                    Dipole: {liveDipole?.magnitude !== undefined ? `${liveDipole.magnitude.toFixed(1)}D` : 'AI'}
+                  </button>
+                </div>
               </div>
 
-              {/* Camera Angle Presets */}
-              <div className="flex items-center gap-1 shrink-0">
-                <span className="text-[10px] font-bold theme-text-muted uppercase tracking-widest mr-0.5 hidden sm:inline">Cam:</span>
-                <button onClick={() => fitModelToWindow('front')} className="text-[11px] sm:text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-1.5 sm:px-2 py-1 rounded-lg transition-all font-medium shrink-0" title="Front Projection (Auto-fitted)">
-                  Front
-                </button>
-                <button onClick={() => fitModelToWindow('chair')} className="text-[11px] sm:text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-1.5 sm:px-2 py-1 rounded-lg transition-all font-medium shrink-0" title="Isometric Chair View (Auto-fitted)">
-                  Iso Chair
-                </button>
-                <button onClick={() => fitModelToWindow('haworth')} className="text-[11px] sm:text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-1.5 sm:px-2 py-1 rounded-lg transition-all font-medium shrink-0" title="Haworth Ring Projection (Auto-fitted)">
-                  Haworth
-                </button>
-                <button onClick={() => fitModelToWindow('fischer')} className="text-[11px] sm:text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-1.5 sm:px-2 py-1 rounded-lg transition-all font-medium shrink-0" title="Fischer / Newman Axial View (Auto-fitted)">
-                  Fischer
-                </button>
-              </div>
-
-              {/* Cinematic Controls & Dipole Toggle */}
-              <div className="flex items-center gap-1 shrink-0">
-                {/* 2D Notebook Structure Button */}
-                <button 
-                  onClick={() => setIsNotebook2DOpen(true)} 
-                  className={`text-[11px] sm:text-xs px-2 sm:px-2.5 py-1 rounded-lg font-bold transition-all border flex items-center gap-1.5 shadow-sm shrink-0 ${
-                    isDarkMode 
-                      ? 'bg-purple-500/20 text-purple-300 border-purple-400/40 hover:bg-purple-500/30 hover:text-white' 
-                      : 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100 hover:text-purple-900'
-                  }`}
-                  title="Open 2D Skeletal & Newman Projection Lab Notebook View"
-                >
-                  <BookOpen className="w-3.5 h-3.5 text-purple-500" />
-                  <span>2D Notebook</span>
-                </button>
-
-                {/* Perfect Fit to Window Button */}
-                <button 
-                  onClick={() => fitModelToWindow('current')} 
-                  className={`text-[11px] sm:text-xs px-2 sm:px-2.5 py-1 rounded-lg font-bold transition-all border flex items-center gap-1 shadow-sm shrink-0 ${
-                    isDarkMode 
-                      ? 'bg-indigo-500/20 text-indigo-300 border-indigo-400/40 hover:bg-indigo-500/30 hover:text-white' 
-                      : 'bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 hover:text-indigo-900'
-                  }`}
-                  title="Fit whole 3D model perfectly within visible window (Hotkey: F)"
-                >
-                  <Maximize2 className="w-3.5 h-3.5 text-indigo-500" />
-                  <span className="hidden sm:inline">Fit View</span>
-                </button>
-                <button onClick={handleZoomIn} className="text-[11px] sm:text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-1.5 sm:px-2 py-1 rounded-lg font-bold transition-all shrink-0" title="Zoom In (+)">
-                  +
-                </button>
-                <button onClick={handleZoomOut} className="text-[11px] sm:text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-1.5 sm:px-2 py-1 rounded-lg font-bold transition-all shrink-0" title="Zoom Out (-)">
-                  -
-                </button>
-                <button 
-                  onClick={() => setIsAutoRotatingMolecule(!isAutoRotatingMolecule)} 
-                  className={`text-[11px] sm:text-xs px-2 sm:px-2.5 py-1 rounded-lg transition-all font-bold border shrink-0 ${isAutoRotatingMolecule ? 'bg-pink-500 text-white border-pink-400 shadow-sm' : 'theme-card hover:opacity-80 theme-text-main border theme-border'}`}
-                >
-                  {isAutoRotatingMolecule ? '⏹ Spin' : '▶ Spin'}
-                </button>
-                <button 
-                  onClick={() => setIsAutoRotatingBond(!isAutoRotatingBond)} 
-                  disabled={!moleculeData?.active_bond}
-                  className={`text-[11px] sm:text-xs px-2 sm:px-2.5 py-1 rounded-lg transition-all font-bold border shrink-0 ${!moleculeData?.active_bond ? 'opacity-40 cursor-not-allowed theme-card text-slate-400 border theme-border' : (isAutoRotatingBond ? 'bg-teal-500 text-white border-teal-400 shadow-sm' : 'theme-card hover:opacity-80 theme-text-main border theme-border')}`}
-                >
-                  {isAutoRotatingBond ? '⏹ Bond' : '▶ Bond'}
-                </button>
-                <button 
-                  onClick={() => setShowDipole(!showDipole)} 
-                  className={`text-[11px] sm:text-xs px-2 sm:px-2.5 py-1 rounded-lg transition-all font-bold border flex items-center gap-1 shrink-0 ${
-                    showDipole 
-                      ? (isDarkMode ? 'bg-sky-500/20 text-sky-300 border-sky-400/50 shadow-[0_0_12px_rgba(56,189,248,0.3)]' : 'bg-sky-100 text-sky-700 border-sky-300 shadow-sm font-bold') 
-                      : 'theme-card hover:opacity-80 theme-text-main border theme-border'
-                  }`}
-                  title="Toggle 3D Live AI Dipole Vector"
-                >
-                  <Zap className={`w-3 h-3 ${isDarkMode ? 'text-sky-400' : 'text-sky-600'}`} />
-                  Dipole: {liveDipole?.magnitude !== undefined ? `${liveDipole.magnitude.toFixed(1)}D` : 'AI'}
-                </button>
-              </div>
+              {/* Right Scroll Button with label */}
+              <button 
+                type="button"
+                onClick={() => scrollToolbar('right')}
+                className="shrink-0 p-1 sm:px-1.5 rounded-lg theme-card border theme-border hover:opacity-100 opacity-80 hover:scale-105 active:scale-95 transition-all ml-1 shadow-sm flex items-center gap-0.5 text-pink-400 font-bold"
+                title="Scroll Right for Spin, Bond, and Zoom Controls (or use mouse scroll wheel)"
+                aria-label="Scroll options right"
+              >
+                <span className="text-[9px] uppercase tracking-wider hidden sm:inline text-slate-300">Spin/Zoom</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
             </div>
           </div>
 
           {/* 3D Canvas Container */}
           <div className="flex-1 w-full min-h-[220px] sm:min-h-[280px] cursor-move z-0 relative touch-none">
+            {/* Quick-Access Floating Zoom & Spin HUD */}
+            <div className="absolute top-3 right-3 z-20 flex flex-col gap-1 p-1 rounded-xl theme-panel backdrop-blur-md border theme-border shadow-lg">
+              <button 
+                type="button"
+                onClick={handleZoomIn} 
+                className="w-7 h-7 flex items-center justify-center rounded-lg theme-card hover:opacity-80 theme-text-main border theme-border text-sm font-bold transition-all shadow-sm"
+                title="Zoom In (+)"
+              >
+                +
+              </button>
+              <button 
+                type="button"
+                onClick={handleZoomOut} 
+                className="w-7 h-7 flex items-center justify-center rounded-lg theme-card hover:opacity-80 theme-text-main border theme-border text-sm font-bold transition-all shadow-sm"
+                title="Zoom Out (-)"
+              >
+                -
+              </button>
+              <button 
+                type="button"
+                onClick={() => fitModelToWindow('current')} 
+                className="w-7 h-7 flex items-center justify-center rounded-lg theme-card hover:opacity-80 theme-text-main border theme-border text-xs font-bold transition-all shadow-sm"
+                title="Fit View / Reset Camera (Hotkey: F)"
+              >
+                <Maximize2 className="w-3.5 h-3.5 text-indigo-400" />
+              </button>
+              <button 
+                type="button"
+                onClick={() => setIsAutoRotatingMolecule(!isAutoRotatingMolecule)} 
+                className={`w-7 h-7 flex items-center justify-center rounded-lg border text-xs font-bold transition-all shadow-sm ${
+                  isAutoRotatingMolecule ? 'bg-pink-500 text-white border-pink-400 shadow-[0_0_10px_rgba(236,72,153,0.5)]' : 'theme-card hover:opacity-80 theme-text-main border theme-border'
+                }`}
+                title={isAutoRotatingMolecule ? "Stop Molecule Spin" : "Auto-Spin Molecule in 3D"}
+              >
+                <RotateCw className={`w-3.5 h-3.5 ${isAutoRotatingMolecule ? 'animate-spin' : ''}`} />
+              </button>
+              {moleculeData?.active_bond && (
+                <button 
+                  type="button"
+                  onClick={() => setIsAutoRotatingBond(!isAutoRotatingBond)} 
+                  className={`w-7 h-7 flex items-center justify-center rounded-lg border text-xs font-bold transition-all shadow-sm ${
+                    isAutoRotatingBond ? 'bg-teal-500 text-white border-teal-400 shadow-[0_0_10px_rgba(20,184,166,0.5)]' : 'theme-card hover:opacity-80 theme-text-main border theme-border'
+                  }`}
+                  title={isAutoRotatingBond ? "Stop Bond Rotation" : "Auto-Rotate Active Dihedral Bond"}
+                >
+                  <Zap className={`w-3.5 h-3.5 ${isAutoRotatingBond ? 'text-white' : 'text-teal-400'}`} />
+                </button>
+              )}
+            </div>
+
             <Canvas camera={{ position: [0, 0, 7], fov: 50 }}>
               <CameraAnimator 
                 targetPos={cameraPos} 
