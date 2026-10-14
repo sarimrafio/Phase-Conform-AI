@@ -1,4 +1,5 @@
 import './globals.css'
+import { Analytics } from '@vercel/analytics/next'
 
 export const metadata = {
   title: 'Phase-Conform AI',
@@ -18,6 +19,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className="bg-slate-900 text-slate-100 min-h-screen">
         {children}
+        <Analytics />
       </body>
     </html>
   )
