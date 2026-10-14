@@ -4,6 +4,8 @@ Interactive 3D conformational analysis with live AI. Rotate bonds, watch the
 energy profile update in real time, flip R/S stereocenters, and talk to a Gemini
 co-pilot that drives the app for you.
 
+📖 **[Read the Complete Beginner's Guide & Instructions (INSTRUCTIONS.md)](./INSTRUCTIONS.md)** for a full tour of every button, slider, chart, and feature.
+
 ## Features
 - **3D viewer** (react-three-fiber): Ball & Stick, Space-Filling, Wireframe.
 - **Steric strain heat map**: atoms glow coral when van der Waals radii overlap.
