@@ -20,10 +20,15 @@ const getBackendUrl = () => {
     if (raw.startsWith('http://') || raw.startsWith('https://')) return raw;
     return `https://${raw}`;
   }
-  if (typeof window !== 'undefined' && window.location.hostname.includes('render.com')) {
+  if (typeof window !== 'undefined') {
+    // In local development, use localhost:8000
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return 'http://localhost:8000';
+    }
+    // Any production deployment (Vercel, Render, custom domains)
     return 'https://phase-conform-backend.onrender.com';
   }
-  return 'http://localhost:8000';
+  return 'https://phase-conform-backend.onrender.com';
 };
 
 
