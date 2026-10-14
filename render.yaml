@@ -1,6 +1,6 @@
 services:
   # =====================================================================
-  # 1. FastAPI Chemical Engine (RDKit, MMFF94 forcefield, 2D SVGs)
+  # FastAPI Chemical Engine (RDKit, MMFF94 forcefield, 2D SVGs)
   # =====================================================================
   - type: web
     name: phase-conform-backend
@@ -15,21 +15,4 @@ services:
       - key: PYTHON_VERSION
         value: 3.11.9
 
-  # =====================================================================
-  # 2. Next.js Frontend Application (3D Three.js, Gemini Copilot, 2D Notebook)
-  # =====================================================================
-  - type: web
-    name: phase-conform-frontend
-    runtime: node
-    plan: free
-    region: oregon
-    buildCommand: npm install && npm run build
-    startCommand: npm run start
-    envVars:
-      - key: NODE_VERSION
-        value: 20.18.0
-      - key: GEMINI_API_KEY
-        sync: false # Set securely in Render dashboard
-      - key: NEXT_PUBLIC_BACKEND_URL
-        value: https://phase-conform-backend.onrender.com
 
