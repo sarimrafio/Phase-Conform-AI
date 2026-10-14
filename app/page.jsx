@@ -6,7 +6,6 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Sphere, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { Beaker, Activity, Hexagon, X, Zap, Brain, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, RotateCw, ZoomIn, ZoomOut, Mic, MicOff, Volume2, VolumeX, Palette, Sun, Moon, Maximize2, BookOpen, Layers, Sliders } from 'lucide-react';
-import * as ort from 'onnxruntime-web';
 import { THEME_PALETTES, getActiveThemeConfig } from '../utils/themes';
 
 // Dynamically import Ketcher & Notebook2DModal so they don't break Next.js SSR
@@ -503,8 +502,13 @@ export default function PhaseConformDashboard() {
   const [themeId, setThemeId] = useState('midnight');
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isThemePickerOpen, setIsThemePickerOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const themePickerRef = useRef(null);
   const toolbarRef = useRef(null);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleToolbarWheel = (e) => {
     if (toolbarRef.current) {
@@ -1182,6 +1186,7 @@ export default function PhaseConformDashboard() {
       
       // -- AI INFERENCE VIA ONNX RUNTIME WEB --
       try {
+        const ort = await import('onnxruntime-web');
         ort.env.wasm.wasmPaths = "https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/";
         const numAtoms = data.atoms.length;
         
@@ -2077,35 +2082,44 @@ export default function PhaseConformDashboard() {
               )}
             </div>
 
-            <Canvas camera={{ position: [0, 0, 7], fov: 50 }}>
-              <CameraAnimator 
-                targetPos={cameraPos} 
-                targetLookAt={cameraLookAt}
-                isAnimating={isAnimatingCamera} 
-                onAnimationComplete={() => setIsAnimatingCamera(false)} 
-                controlsRef={orbitControlsRef}
-              />
-              <ambientLight intensity={isDarkMode ? 2.0 : 2.8} color={currentTheme.ambientLight} />
-              <pointLight position={[10, 10, 10]} intensity={isDarkMode ? 2.5 : 3.0} color="#ffffff" />
-              <pointLight position={[-10, -10, -10]} intensity={isDarkMode ? 1.0 : 1.2} color={currentTheme.pointLight} />
-              <DynamicMolecule 
-                moleculeData={moleculeData} 
-                conformationPhysics={conformationPhysics} 
-                renderMode={renderMode} 
-                onInvertStereo={handleInvertStereo} 
-                onBondClick={handleBondClick} 
-                showDipole={showDipole} 
-                isDarkMode={isDarkMode}
-              />
-              <OrbitControls 
-                ref={orbitControlsRef}
-                enablePan={true} 
-                enableZoom={true} 
-                autoRotate={isAutoRotatingMolecule}
-                autoRotateSpeed={2.0}
-                onStart={() => setIsAnimatingCamera(false)} 
-              />
-            </Canvas>
+            {isMounted ? (
+              <Canvas camera={{ position: [0, 0, 7], fov: 50 }}>
+                <CameraAnimator 
+                  targetPos={cameraPos} 
+                  targetLookAt={cameraLookAt}
+                  isAnimating={isAnimatingCamera} 
+                  onAnimationComplete={() => setIsAnimatingCamera(false)} 
+                  controlsRef={orbitControlsRef}
+                />
+                <ambientLight intensity={isDarkMode ? 2.0 : 2.8} color={currentTheme.ambientLight} />
+                <pointLight position={[10, 10, 10]} intensity={isDarkMode ? 2.5 : 3.0} color="#ffffff" />
+                <pointLight position={[-10, -10, -10]} intensity={isDarkMode ? 1.0 : 1.2} color={currentTheme.pointLight} />
+                <DynamicMolecule 
+                  moleculeData={moleculeData} 
+                  conformationPhysics={conformationPhysics} 
+                  renderMode={renderMode} 
+                  onInvertStereo={handleInvertStereo} 
+                  onBondClick={handleBondClick} 
+                  showDipole={showDipole} 
+                  isDarkMode={isDarkMode}
+                />
+                <OrbitControls 
+                  ref={orbitControlsRef}
+                  enablePan={true} 
+                  enableZoom={true} 
+                  autoRotate={isAutoRotatingMolecule}
+                  autoRotateSpeed={2.0}
+                  onStart={() => setIsAnimatingCamera(false)} 
+                />
+              </Canvas>
+            ) : (
+              <div className="w-full h-full min-h-[220px] sm:min-h-[280px] flex items-center justify-center text-slate-500 font-mono text-xs">
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                  <span>Loading 3D Chemistry Viewport...</span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Mobile Fullscreen 3D Studio Floating Dihedral Controller */}
