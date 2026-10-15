@@ -563,7 +563,11 @@ export default function PhaseConformDashboard() {
     '--theme-accent-secondary': currentTheme.accentSecondary,
     '--theme-canvas-bg': currentTheme.canvasBg,
     '--theme-canvas-grid': currentTheme.canvasGrid,
-  }), [currentTheme]);
+    '--neu-shadow-dark': currentTheme.neuShadowDark || (isDarkMode ? 'rgba(0, 0, 0, 0.75)' : 'rgba(163, 177, 198, 0.55)'),
+    '--neu-shadow-light': currentTheme.neuShadowLight || (isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.95)'),
+    '--neu-border': currentTheme.neuBorder || (isDarkMode ? 'rgba(255, 255, 255, 0.07)' : 'rgba(255, 255, 255, 0.85)'),
+    '--neu-accent-glow': currentTheme.neuAccentGlow || currentTheme.accentPrimary,
+  }), [currentTheme, isDarkMode]);
 
   // Synchronous physical computation of conformation geometry, clashes, COM, and live dipole
   const conformationPhysics = useMemo(() => {
@@ -1604,8 +1608,8 @@ export default function PhaseConformDashboard() {
       style={themeStyles}
     >
       
-      {/* Header - Compact Glass Panel (Optimized for Mobile Portrait & Desktop) */}
-      <header className="mb-2.5 flex flex-col gap-2 theme-panel backdrop-blur-xl px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl border shadow-lg shrink-0 relative z-40">
+      {/* Header - Neumorphic Extruded Panel (Optimized for Mobile Portrait & Desktop) */}
+      <header className="mb-3 flex flex-col gap-2.5 neu-raised px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-2xl shrink-0 relative z-40">
         {/* Row 1: Brand Logo + Formula & Badges + Quick Settings */}
         <div className="flex items-center justify-between gap-2 w-full flex-wrap">
           <div className="flex items-center gap-2 flex-wrap min-w-0">
@@ -1614,7 +1618,7 @@ export default function PhaseConformDashboard() {
               <span className="truncate">Phase-Conform AI</span>
             </h1>
             {formulaParts.length > 0 && (
-              <span className="text-[11px] sm:text-xs theme-card theme-border px-2 py-0.5 rounded-full font-mono flex items-center gap-1 font-bold shadow-inner shrink-0">
+              <span className="text-[11px] sm:text-xs neu-pill-inset px-2.5 py-0.5 font-mono flex items-center gap-1 font-bold shrink-0">
                 <span className="text-[9px] theme-text-muted uppercase mr-0.5">Formula:</span>
                 {formulaParts.map((p, idx) => (
                   <span key={idx} className="font-bold theme-text-main">
@@ -1624,23 +1628,23 @@ export default function PhaseConformDashboard() {
                 ))}
               </span>
             )}
-            <span className={`text-[10px] sm:text-[11px] ${isDarkMode ? 'bg-pink-500/10 text-pink-400 border-pink-500/20' : 'bg-pink-50 text-pink-600 border-pink-200'} border px-1.5 sm:px-2 py-0.5 rounded-full font-mono uppercase flex items-center gap-1 font-bold shrink-0`}>
+            <span className={`text-[10px] sm:text-[11px] neu-pill px-2.5 py-0.5 font-mono uppercase flex items-center gap-1 font-bold shrink-0 ${isDarkMode ? 'text-pink-400' : 'text-pink-600'}`}>
               <Zap className={`w-3 h-3 ${isDarkMode ? 'text-pink-400' : 'text-pink-600'}`} /> ONNX Active
             </span>
             {isOffline && (
-              <span className={`text-[10px] sm:text-[11px] ${isDarkMode ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-amber-50 text-amber-700 border-amber-200'} border px-1.5 sm:px-2 py-0.5 rounded-full font-mono uppercase font-bold shrink-0`}>
+              <span className={`text-[10px] sm:text-[11px] neu-pill px-2.5 py-0.5 font-mono uppercase font-bold shrink-0 ${isDarkMode ? 'text-amber-300' : 'text-amber-700'}`}>
                 Offline Cache
               </span>
             )}
           </div>
 
           {/* Quick Settings: Theme, Dark Mode, Gemini Toggle */}
-          <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
             {/* 10 Popular Color Palettes Selector */}
             <div className="relative" ref={themePickerRef}>
               <button 
                 onClick={() => setIsThemePickerOpen(!isThemePickerOpen)}
-                className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-bold border transition-all theme-sub theme-border hover:opacity-90 shadow-sm"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold neu-btn shrink-0"
                 title="Change Color Palette (10 Popular Themes)"
               >
                 <span className="w-2.5 h-2.5 rounded-full shrink-0 shadow-sm" style={{ backgroundColor: currentTheme.dotColor || currentTheme.accentPrimary }}></span>
@@ -1650,21 +1654,21 @@ export default function PhaseConformDashboard() {
 
               {/* Dropdown Popover */}
               {isThemePickerOpen && (
-                <div className="absolute right-0 top-full mt-2 w-72 p-3 rounded-2xl theme-sub border shadow-2xl z-[100] backdrop-blur-2xl">
-                  <div className="flex items-center justify-between mb-2 pb-2 border-b border-white/10">
+                <div className="absolute right-0 top-full mt-2 w-72 p-3.5 rounded-2xl neu-raised-lg z-[100] backdrop-blur-xl">
+                  <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-white/10">
                     <span className="text-xs font-bold flex items-center gap-1.5 theme-text-primary">
                       <Palette className="w-3.5 h-3.5 text-pink-400" />
                       Color Palettes (10)
                     </span>
                     <button 
                       onClick={() => setIsDarkMode(!isDarkMode)}
-                      className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-md border border-white/10 theme-card hover:opacity-80"
+                      className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-md neu-btn"
                     >
                       {isDarkMode ? <Moon className="w-3 h-3 text-indigo-300" /> : <Sun className="w-3 h-3 text-amber-400" />}
                       {isDarkMode ? 'Dark' : 'Light'}
                     </button>
                   </div>
-                  <div className="grid grid-cols-2 gap-1.5 max-h-64 overflow-y-auto custom-scrollbar pr-1">
+                  <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto custom-scrollbar pr-1">
                     {THEME_PALETTES.map((pal) => (
                       <button
                         key={pal.id}
@@ -1672,10 +1676,10 @@ export default function PhaseConformDashboard() {
                           setThemeId(pal.id);
                           setIsThemePickerOpen(false);
                         }}
-                        className={`flex items-center gap-2 p-2 rounded-xl text-left border transition-all ${
+                        className={`flex items-center gap-2 p-2 rounded-xl text-left transition-all ${
                           themeId === pal.id 
-                            ? 'border-pink-500/80 bg-pink-500/20 shadow-sm' 
-                            : 'border-white/5 theme-card hover:opacity-90'
+                            ? 'neu-btn-active' 
+                            : 'neu-btn'
                         }`}
                       >
                         <span className="w-3 h-3 rounded-full shrink-0 shadow" style={{ backgroundColor: pal.dotColor }}></span>
@@ -1693,7 +1697,7 @@ export default function PhaseConformDashboard() {
             {/* Interactive Guided Tour & New User Guide Button */}
             <button 
               onClick={() => setIsOnboardingOpen(true)}
-              className="flex items-center gap-1 p-1.5 px-2 rounded-lg text-xs font-bold border transition-all theme-sub theme-border hover:border-pink-500/40 text-pink-400 hover:text-pink-300 shadow-sm"
+              className="flex items-center gap-1.5 p-1.5 px-2.5 rounded-xl text-xs font-bold neu-btn text-pink-400 hover:text-pink-300 shrink-0"
               title="Interactive Beginner's Tutorial & User Guide"
             >
               <Compass className="w-3.5 h-3.5 text-pink-400" />
@@ -1703,11 +1707,7 @@ export default function PhaseConformDashboard() {
             {/* Quick Dark / Light Mode Switch */}
             <button 
               onClick={() => setIsDarkMode(!isDarkMode)}
-              className={`p-1.5 px-2 rounded-lg border transition-all flex items-center gap-1 text-xs font-bold ${
-                isDarkMode 
-                  ? 'theme-sub theme-border hover:border-pink-500/40 text-indigo-200' 
-                  : 'bg-amber-400/20 text-amber-700 border-amber-400/40 hover:bg-amber-400/30'
-              }`}
+              className="p-1.5 px-2.5 rounded-xl neu-btn flex items-center gap-1.5 text-xs font-bold shrink-0"
               title={`Switch to ${isDarkMode ? 'Light' : 'Dark'} Mode`}
             >
               {isDarkMode ? <Moon className="w-3.5 h-3.5 text-indigo-300" /> : <Sun className="w-3.5 h-3.5 text-amber-500" />}
@@ -1717,10 +1717,10 @@ export default function PhaseConformDashboard() {
             {/* Gemini Co-Pilot Assistant Toggle */}
             <button 
               onClick={() => setChatOpen(prev => !prev)}
-              className={`text-xs font-bold border px-2.5 py-1.5 rounded-lg transition-all text-center flex items-center gap-1.5 shrink-0 active:scale-95 ${
+              className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all text-center flex items-center gap-1.5 shrink-0 ${
                 chatOpen 
-                  ? 'bg-pink-500 text-white border-pink-400 shadow-[0_0_15px_rgba(244,114,182,0.4)]' 
-                  : 'bg-gradient-to-r from-pink-500/20 to-purple-500/20 hover:from-pink-500/30 hover:to-purple-500/30 text-pink-400 border-pink-500/30'
+                  ? 'neu-btn-active' 
+                  : 'neu-btn text-pink-400'
               }`}
               title="Toggle Gemini 3.8 Flash AI Co-Pilot Assistant"
             >
@@ -1745,11 +1745,11 @@ export default function PhaseConformDashboard() {
           />
 
           {/* Action Buttons: Random, 2D Notebook, Draw */}
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar mobile-touch-scroll shrink-0 justify-end" data-tour="notebook-draw">
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar mobile-touch-scroll shrink-0 justify-end" data-tour="notebook-draw">
             {/* Random Molecule Generator Button */}
             <button 
               onClick={loadRandomCompound} 
-              className="text-xs font-bold theme-sub hover:opacity-80 theme-border border px-2.5 py-1.5 rounded-lg transition-all text-center uppercase tracking-wider shrink-0 flex items-center gap-1 shadow-sm active:scale-95"
+              className="text-xs font-bold neu-btn px-2.5 sm:px-3 py-1.5 rounded-xl transition-all text-center uppercase tracking-wider shrink-0 flex items-center gap-1.5"
               title="Generate Random Molecule (Alkane, Cycloalkane, Bioactive, Chiral)"
             >
               <span className="text-sm">🎲</span>
@@ -1759,7 +1759,7 @@ export default function PhaseConformDashboard() {
             {/* 2D Notebook Structure Button */}
             <button 
               onClick={() => setIsNotebook2DOpen(true)}
-              className="flex items-center gap-1 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold shadow-md shadow-purple-500/20 transition-all shrink-0 active:scale-95"
+              className="flex items-center gap-1.5 neu-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 text-purple-400 hover:text-purple-300"
               title="Open 2D Skeletal & Newman Projection Lab Notebook View"
             >
               <BookOpen className="w-3.5 h-3.5" />
@@ -1770,7 +1770,7 @@ export default function PhaseConformDashboard() {
             {/* Draw Button */}
             <button 
               onClick={() => setIsDrawing(true)}
-              className="flex items-center gap-1 bg-gradient-to-r from-indigo-400 to-purple-400 hover:from-indigo-500 hover:to-purple-500 text-white px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold shadow-md shadow-indigo-500/20 transition-all shrink-0 active:scale-95"
+              className="flex items-center gap-1.5 neu-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 text-indigo-400 hover:text-indigo-300"
             >
               <Beaker className="w-3.5 h-3.5" />
               <span>Draw</span>
@@ -1780,13 +1780,13 @@ export default function PhaseConformDashboard() {
       </header>
 
       {/* Mobile Portrait View Mode Switcher (Visible only on mobile portrait screens) */}
-      <div className="md:hidden flex items-center justify-between gap-1 p-1 rounded-xl theme-panel border theme-border mb-2.5 shadow-sm shrink-0">
+      <div className="md:hidden flex items-center justify-between gap-1.5 p-1.5 rounded-2xl neu-inset mb-3 shrink-0">
         <button
           onClick={() => setMobileTab('all')}
-          className={`flex-1 py-1.5 px-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 ${
+          className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
             mobileTab === 'all'
-              ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-sm'
-              : 'theme-text-muted hover:theme-text-main'
+              ? 'neu-btn-active'
+              : 'neu-btn'
           }`}
         >
           <Layers className="w-3.5 h-3.5" />
@@ -1794,10 +1794,10 @@ export default function PhaseConformDashboard() {
         </button>
         <button
           onClick={() => setMobileTab('canvas')}
-          className={`flex-1 py-1.5 px-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 ${
+          className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
             mobileTab === 'canvas'
-              ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-sm'
-              : 'theme-text-muted hover:theme-text-main'
+              ? 'neu-btn-active'
+              : 'neu-btn'
           }`}
         >
           <Activity className="w-3.5 h-3.5" />
@@ -1805,10 +1805,10 @@ export default function PhaseConformDashboard() {
         </button>
         <button
           onClick={() => setMobileTab('analysis')}
-          className={`flex-1 py-1.5 px-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 ${
+          className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
             mobileTab === 'analysis'
-              ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-sm'
-              : 'theme-text-muted hover:theme-text-main'
+              ? 'neu-btn-active'
+              : 'neu-btn'
           }`}
         >
           <Zap className="w-3.5 h-3.5" />
@@ -1817,11 +1817,11 @@ export default function PhaseConformDashboard() {
       </div>
       
       {/* Main HUD */}
-      <main className="grid grid-cols-1 md:grid-cols-12 gap-3 flex-1 min-h-0 relative">
+      <main className="grid grid-cols-1 md:grid-cols-12 gap-3.5 flex-1 min-h-0 relative">
         
         {/* Loading Overlay */}
         {isLoading && (
-          <div className={`absolute inset-0 z-50 ${isDarkMode ? 'bg-[#1e1e2f]/80 border-indigo-300/20' : 'bg-white/85 border-slate-200 shadow-2xl'} backdrop-blur-xl flex flex-col items-center justify-center rounded-3xl border`}>
+          <div className="absolute inset-0 z-50 neu-raised-lg backdrop-blur-xl flex flex-col items-center justify-center rounded-3xl p-6">
             <Activity className={`w-16 h-16 ${isDarkMode ? 'text-indigo-300' : 'text-indigo-600'} animate-pulse mb-4`} />
             <h2 className={`text-xl font-bold ${isDarkMode ? 'text-indigo-300' : 'text-indigo-900'} tracking-[0.2em] uppercase`}>Computing 3D Coordinates</h2>
             <p className={`mt-2 ${isDarkMode ? 'text-indigo-200/60' : 'text-slate-600 font-medium'}`}>MMFF94 Forcefield Optimization in progress...</p>
@@ -1830,16 +1830,16 @@ export default function PhaseConformDashboard() {
 
         {/* Error Overlay */}
         {errorMsg && (
-          <div className="absolute inset-0 z-50 bg-[#3f202a]/90 backdrop-blur-xl flex flex-col items-center justify-center rounded-3xl border border-pink-400">
+          <div className="absolute inset-0 z-50 bg-[#3f202a]/95 backdrop-blur-xl flex flex-col items-center justify-center rounded-3xl border border-pink-400 p-6">
             <h2 className="text-2xl font-bold text-white mb-2">Calculation Error</h2>
             <p className="text-pink-200">{errorMsg}</p>
-            <button onClick={() => fetchMoleculeData("CCCC")} className="mt-6 bg-white/10 hover:bg-white/20 px-6 py-2 rounded text-white transition-colors">Reset to Butane</button>
+            <button onClick={() => fetchMoleculeData("CCCC")} className="mt-6 neu-btn px-6 py-2 rounded-xl text-white font-bold transition-colors">Reset to Butane</button>
           </div>
         )}
 
         {/* Left Column: The Reaction Canvas */}
         <section 
-          className={`md:col-span-6 lg:col-span-6 relative theme-panel backdrop-blur-md rounded-2xl border theme-border overflow-hidden flex-col shadow-[inset_0_0_60px_rgba(0,0,0,0.15)] transition-colors duration-500 ${
+          className={`md:col-span-6 lg:col-span-6 relative neu-raised rounded-3xl overflow-hidden flex-col transition-colors duration-500 ${
             mobileTab === 'analysis' ? 'hidden md:flex' : 'flex'
           } ${
             mobileTab === 'canvas' 
@@ -1856,7 +1856,7 @@ export default function PhaseConformDashboard() {
           ></div>
           
           {/* Top HUD Bar (Above 3D Canvas - completely non-overlapping) */}
-          <div className="shrink-0 z-10 theme-sub backdrop-blur-md border-b theme-border p-2.5 sm:p-3 flex flex-col gap-2">
+          <div className="shrink-0 z-10 neu-inset-sm border-b p-2.5 sm:p-3 flex flex-col gap-2">
             {/* Row 1: Title, Active Compound Chemical Formula & Live Clash Factor HUD */}
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
@@ -1866,7 +1866,7 @@ export default function PhaseConformDashboard() {
                     Steric Strain Heat Map & 3D Viewer
                   </h2>
                   {formulaParts.length > 0 && (
-                    <span className={`text-xs font-mono font-bold theme-card ${isDarkMode ? 'text-pink-300' : 'text-pink-600'} px-2 py-0.5 rounded-md border theme-border flex items-center gap-0.5 shadow-sm`}>
+                    <span className={`text-xs font-mono font-bold neu-pill-inset px-2.5 py-0.5 flex items-center gap-0.5 ${isDarkMode ? 'text-pink-300' : 'text-pink-600'}`}>
                       <span className="text-[10px] theme-text-muted mr-0.5">Formula:</span>
                       {formulaParts.map((p, idx) => (
                         <span key={idx}>
@@ -1883,7 +1883,7 @@ export default function PhaseConformDashboard() {
 
               {/* Live Metrics: Energy & Clash Factor */}
               <div className="flex items-center gap-2 flex-wrap">
-                <div className="flex items-center gap-2 theme-card px-2.5 py-1 rounded-xl border theme-border shadow-sm">
+                <div className="flex items-center gap-2 neu-card px-3 py-1.5 rounded-xl">
                   <div className="flex flex-col items-end">
                     <span className="text-[9px] font-bold theme-text-muted tracking-widest uppercase">Energy</span>
                     <div className={`font-mono text-sm font-bold ${isDarkMode ? 'text-pink-300' : 'text-pink-600'}`}>
@@ -1896,17 +1896,17 @@ export default function PhaseConformDashboard() {
                 {(() => {
                   const isClashing = clashData.overlap > 0;
                   return (
-                    <div className="flex items-center gap-2 theme-card px-2.5 py-1 rounded-xl border theme-border shadow-sm">
+                    <div className="flex items-center gap-2 neu-card px-3 py-1.5 rounded-xl">
                       <div className="flex flex-col items-end">
                         <span className="text-[9px] font-bold theme-text-muted tracking-widest uppercase">Clash Factor</span>
                         <div className={`font-mono text-sm font-bold ${isClashing ? (isDarkMode ? 'text-pink-400' : 'text-pink-600') : 'theme-text-main'}`}>
                           {clashData.distance.toFixed(2)} Å
                         </div>
                       </div>
-                      <div className={`px-2 py-0.5 rounded-full text-[9px] uppercase font-bold tracking-wider border transition-all ${
+                      <div className={`px-2 py-0.5 rounded-full text-[9px] uppercase font-bold tracking-wider transition-all ${
                         isClashing 
-                          ? (isDarkMode ? 'bg-pink-500/20 text-pink-300 border-pink-400/50 shadow-sm' : 'bg-pink-100 text-pink-700 border-pink-300')
-                          : (isDarkMode ? 'bg-teal-500/20 text-teal-300 border-teal-400/30' : 'bg-teal-100 text-teal-700 border-teal-300')
+                          ? (isDarkMode ? 'bg-pink-500/20 text-pink-300 border border-pink-400/50 shadow-sm animate-pulse' : 'bg-pink-100 text-pink-700 border border-pink-300')
+                          : (isDarkMode ? 'bg-teal-500/20 text-teal-300 border border-teal-400/30' : 'bg-teal-100 text-teal-700 border border-teal-300')
                       }`}>
                         {isClashing ? `CRITICAL (${clashData.overlap.toFixed(2)}Å)` : 'STABLE'}
                       </div>
@@ -1917,22 +1917,22 @@ export default function PhaseConformDashboard() {
             </div>
 
             {/* Row 2: Atom Color Legend (CPK Palette or ESP Heatmap) - Horizontally scrollable on mobile */}
-            <div className="flex items-center gap-1.5 pt-1.5 border-t theme-border text-[10px] overflow-x-auto no-scrollbar mobile-touch-scroll shrink-0">
+            <div className="flex items-center gap-1.5 pt-1.5 border-t border-white/5 text-[10px] overflow-x-auto no-scrollbar mobile-touch-scroll shrink-0">
               {renderMode === 'esp' ? (
                 <div className="flex items-center gap-2 shrink-0">
                   <span className={`font-bold ${isDarkMode ? 'text-rose-300' : 'text-rose-600'} uppercase tracking-widest flex items-center gap-1 shrink-0`}>
                     <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
                     AI Electrostatic Potential (ESP):
                   </span>
-                  <span className="flex items-center gap-1.5 theme-card px-2 py-0.5 rounded-md border theme-border shadow-sm shrink-0">
+                  <span className="flex items-center gap-1.5 neu-pill-inset px-2.5 py-0.5 shrink-0">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#f43f5e] shrink-0"></span>
                     <span className={`font-bold ${isDarkMode ? 'text-rose-300' : 'text-rose-700'}`}>δ⁻ Negative (Electron-Rich)</span>
                   </span>
-                  <span className="flex items-center gap-1.5 theme-card px-2 py-0.5 rounded-md border theme-border shadow-sm shrink-0">
+                  <span className="flex items-center gap-1.5 neu-pill-inset px-2.5 py-0.5 shrink-0">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#64748b] shrink-0"></span>
                     <span className="font-bold theme-text-sub">Neutral Carbon</span>
                   </span>
-                  <span className="flex items-center gap-1.5 theme-card px-2 py-0.5 rounded-md border theme-border shadow-sm shrink-0">
+                  <span className="flex items-center gap-1.5 neu-pill-inset px-2.5 py-0.5 shrink-0">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#38bdf8] shrink-0"></span>
                     <span className={`font-bold ${isDarkMode ? 'text-sky-300' : 'text-sky-700'}`}>δ⁺ Positive (Electron-Poor)</span>
                   </span>
@@ -1940,41 +1940,41 @@ export default function PhaseConformDashboard() {
               ) : (
                 <div className="flex items-center gap-1.5 shrink-0">
                   <span className="font-bold theme-text-muted uppercase tracking-widest mr-0.5 shrink-0">Atom Colors:</span>
-                  <span className="flex items-center gap-1.5 theme-card px-2 py-0.5 rounded-md border theme-border shadow-sm shrink-0">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#64748b] border border-white/20 shrink-0"></span>
+                  <span className="flex items-center gap-1.5 neu-pill-inset px-2 py-0.5 shrink-0">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#64748b] shrink-0"></span>
                     <span className="font-bold theme-text-sub">C (Carbon)</span>
                   </span>
-                  <span className="flex items-center gap-1.5 theme-card px-2 py-0.5 rounded-md border theme-border shadow-sm shrink-0">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#f8fafc] border border-slate-400 shrink-0"></span>
+                  <span className="flex items-center gap-1.5 neu-pill-inset px-2 py-0.5 shrink-0">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#f8fafc] shrink-0"></span>
                     <span className="font-bold theme-text-sub">H (Hydrogen)</span>
                   </span>
-                  <span className="flex items-center gap-1.5 theme-card px-2 py-0.5 rounded-md border theme-border shadow-sm shrink-0">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#fda4af] border border-pink-300/40 shrink-0"></span>
+                  <span className="flex items-center gap-1.5 neu-pill-inset px-2 py-0.5 shrink-0">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#fda4af] shrink-0"></span>
                     <span className="font-bold theme-text-sub">O (Oxygen)</span>
                   </span>
-                  <span className="flex items-center gap-1.5 theme-card px-2 py-0.5 rounded-md border theme-border shadow-sm shrink-0">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#93c5fd] border border-blue-300/40 shrink-0"></span>
+                  <span className="flex items-center gap-1.5 neu-pill-inset px-2 py-0.5 shrink-0">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#93c5fd] shrink-0"></span>
                     <span className="font-bold theme-text-sub">N (Nitrogen)</span>
                   </span>
-                  <span className="flex items-center gap-1.5 theme-card px-2 py-0.5 rounded-md border theme-border shadow-sm shrink-0">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#4ade80] border border-emerald-300/40 shrink-0"></span>
+                  <span className="flex items-center gap-1.5 neu-pill-inset px-2 py-0.5 shrink-0">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#4ade80] shrink-0"></span>
                     <span className="font-bold theme-text-sub">Cl/F (Halogens)</span>
                   </span>
-                  <span className={`flex items-center gap-1.5 ${isDarkMode ? 'bg-pink-500/10 border-pink-500/20' : 'bg-pink-50 border-pink-200'} px-2 py-0.5 rounded-md border shrink-0`}>
+                  <span className={`flex items-center gap-1.5 neu-pill-inset px-2 py-0.5 shrink-0 ${isDarkMode ? 'text-pink-300' : 'text-pink-600'}`}>
                     <span className="w-2.5 h-2.5 rounded-full bg-[#fb7185] animate-pulse shrink-0"></span>
-                    <span className={`font-bold ${isDarkMode ? 'text-pink-300' : 'text-pink-600'}`}>Flush = Steric Clash</span>
+                    <span className="font-bold">Flush = Steric Clash</span>
                   </span>
                 </div>
               )}
             </div>
 
             {/* Row 3: Render Modes, Camera Presets & Controls with Left/Right Scroll Wheel & Buttons */}
-            <div className="relative flex items-center pt-1.5 border-t theme-border shrink-0 -mx-1 px-1">
+            <div className="relative flex items-center pt-1.5 border-t border-white/5 shrink-0 -mx-1 px-1">
               {/* Left Scroll Button */}
               <button 
                 type="button"
                 onClick={() => scrollToolbar('left')}
-                className="shrink-0 p-1 sm:p-1.5 rounded-lg theme-card border theme-border hover:opacity-100 opacity-70 hover:scale-105 active:scale-95 transition-all mr-1 shadow-sm flex items-center justify-center text-slate-300"
+                className="shrink-0 p-1.5 rounded-xl neu-btn mr-1.5 flex items-center justify-center text-slate-300"
                 title="Scroll Left (or use mouse scroll wheel)"
                 aria-label="Scroll options left"
               >
@@ -1985,23 +1985,23 @@ export default function PhaseConformDashboard() {
               <div 
                 ref={toolbarRef}
                 onWheel={handleToolbarWheel}
-                className="flex-1 flex items-center gap-2 overflow-x-auto no-scrollbar mobile-touch-scroll scroll-smooth py-0.5"
+                className="flex-1 flex items-center gap-2 overflow-x-auto no-scrollbar mobile-touch-scroll scroll-smooth py-1"
               >
                 {/* Render Modes: Ball & Stick, Space-Filling, Wireframe, ESP Heatmap */}
-                <div className="flex items-center gap-0.5 sm:gap-1 theme-card p-0.5 rounded-lg border theme-border shadow-inner shrink-0">
+                <div className="flex items-center gap-1 neu-inset p-1 rounded-xl shrink-0">
                   {[
-                    ['ball-stick', 'Ball & Stick', 'bg-indigo-500 text-white shadow-sm'],
-                    ['vdw', 'Space-Filling', 'bg-purple-500 text-white shadow-sm'],
-                    ['wireframe', 'Wireframe', 'bg-teal-500 text-white shadow-sm'],
-                    ['esp', 'ESP Heatmap', 'bg-rose-500 text-white shadow-sm'],
-                  ].map(([mode, label, activeClass]) => (
+                    ['ball-stick', 'Ball & Stick'],
+                    ['vdw', 'Space-Filling'],
+                    ['wireframe', 'Wireframe'],
+                    ['esp', 'ESP Heatmap'],
+                  ].map(([mode, label]) => (
                     <button
                       key={mode}
                       onClick={() => setRenderMode(mode)}
-                      className={`text-[10px] sm:text-xs px-2 sm:px-2.5 py-1 rounded-md font-bold uppercase tracking-wider transition-all border shrink-0 ${
+                      className={`text-[10px] sm:text-xs px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider transition-all shrink-0 ${
                         renderMode === mode 
-                          ? `${activeClass} border-transparent` 
-                          : 'theme-text-sub border-transparent hover:theme-text-main hover:opacity-80'
+                          ? 'neu-btn-active' 
+                          : 'neu-btn opacity-85 hover:opacity-100'
                       }`}
                     >
                       {label}
@@ -2012,16 +2012,16 @@ export default function PhaseConformDashboard() {
                 {/* Camera Angle Presets */}
                 <div className="flex items-center gap-1 shrink-0">
                   <span className="text-[10px] font-bold theme-text-muted uppercase tracking-widest mr-0.5 hidden sm:inline">Cam:</span>
-                  <button onClick={() => fitModelToWindow('front')} className="text-[11px] sm:text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-1.5 sm:px-2 py-1 rounded-lg transition-all font-medium shrink-0" title="Front Projection (Auto-fitted)">
+                  <button onClick={() => fitModelToWindow('front')} className="text-[11px] sm:text-xs neu-btn px-2.5 py-1 rounded-xl font-medium shrink-0" title="Front Projection (Auto-fitted)">
                     Front
                   </button>
-                  <button onClick={() => fitModelToWindow('chair')} className="text-[11px] sm:text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-1.5 sm:px-2 py-1 rounded-lg transition-all font-medium shrink-0" title="Isometric Chair View (Auto-fitted)">
+                  <button onClick={() => fitModelToWindow('chair')} className="text-[11px] sm:text-xs neu-btn px-2.5 py-1 rounded-xl font-medium shrink-0" title="Isometric Chair View (Auto-fitted)">
                     Iso Chair
                   </button>
-                  <button onClick={() => fitModelToWindow('haworth')} className="text-[11px] sm:text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-1.5 sm:px-2 py-1 rounded-lg transition-all font-medium shrink-0" title="Haworth Ring Projection (Auto-fitted)">
+                  <button onClick={() => fitModelToWindow('haworth')} className="text-[11px] sm:text-xs neu-btn px-2.5 py-1 rounded-xl font-medium shrink-0" title="Haworth Ring Projection (Auto-fitted)">
                     Haworth
                   </button>
-                  <button onClick={() => fitModelToWindow('fischer')} className="text-[11px] sm:text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-1.5 sm:px-2 py-1 rounded-lg transition-all font-medium shrink-0" title="Fischer / Newman Axial View (Auto-fitted)">
+                  <button onClick={() => fitModelToWindow('fischer')} className="text-[11px] sm:text-xs neu-btn px-2.5 py-1 rounded-xl font-medium shrink-0" title="Fischer / Newman Axial View (Auto-fitted)">
                     Fischer
                   </button>
                 </div>
@@ -2031,11 +2031,7 @@ export default function PhaseConformDashboard() {
                   {/* 2D Notebook Structure Button */}
                   <button 
                     onClick={() => setIsNotebook2DOpen(true)} 
-                    className={`text-[11px] sm:text-xs px-2 sm:px-2.5 py-1 rounded-lg font-bold transition-all border flex items-center gap-1.5 shadow-sm shrink-0 ${
-                      isDarkMode 
-                        ? 'bg-purple-500/20 text-purple-300 border-purple-400/40 hover:bg-purple-500/30 hover:text-white' 
-                        : 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100 hover:text-purple-900'
-                    }`}
+                    className="text-[11px] sm:text-xs px-2.5 py-1 rounded-xl font-bold transition-all neu-btn flex items-center gap-1.5 text-purple-400 hover:text-purple-300 shrink-0"
                     title="Open 2D Skeletal & Newman Projection Lab Notebook View"
                   >
                     <BookOpen className="w-3.5 h-3.5 text-purple-500" />
@@ -2045,25 +2041,21 @@ export default function PhaseConformDashboard() {
                   {/* Perfect Fit to Window Button */}
                   <button 
                     onClick={() => fitModelToWindow('current')} 
-                    className={`text-[11px] sm:text-xs px-2 sm:px-2.5 py-1 rounded-lg font-bold transition-all border flex items-center gap-1 shadow-sm shrink-0 ${
-                      isDarkMode 
-                        ? 'bg-indigo-500/20 text-indigo-300 border-indigo-400/40 hover:bg-indigo-500/30 hover:text-white' 
-                        : 'bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 hover:text-indigo-900'
-                    }`}
+                    className="text-[11px] sm:text-xs px-2.5 py-1 rounded-xl font-bold transition-all neu-btn flex items-center gap-1 text-indigo-400 hover:text-indigo-300 shrink-0"
                     title="Fit whole 3D model perfectly within visible window (Hotkey: F)"
                   >
                     <Maximize2 className="w-3.5 h-3.5 text-indigo-500" />
                     <span className="hidden sm:inline">Fit View</span>
                   </button>
-                  <button onClick={handleZoomIn} className="text-[11px] sm:text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-1.5 sm:px-2 py-1 rounded-lg font-bold transition-all shrink-0" title="Zoom In (+)">
+                  <button onClick={handleZoomIn} className="text-[11px] sm:text-xs neu-btn px-2.5 py-1 rounded-xl font-bold transition-all shrink-0" title="Zoom In (+)">
                     +
                   </button>
-                  <button onClick={handleZoomOut} className="text-[11px] sm:text-xs theme-card hover:opacity-80 theme-text-main border theme-border px-1.5 sm:px-2 py-1 rounded-lg font-bold transition-all shrink-0" title="Zoom Out (-)">
+                  <button onClick={handleZoomOut} className="text-[11px] sm:text-xs neu-btn px-2.5 py-1 rounded-xl font-bold transition-all shrink-0" title="Zoom Out (-)">
                     -
                   </button>
                   <button 
                     onClick={() => setIsAutoRotatingMolecule(!isAutoRotatingMolecule)} 
-                    className={`text-[11px] sm:text-xs px-2 sm:px-2.5 py-1 rounded-lg transition-all font-bold border shrink-0 ${isAutoRotatingMolecule ? 'bg-pink-500 text-white border-pink-400 shadow-sm' : 'theme-card hover:opacity-80 theme-text-main border theme-border'}`}
+                    className={`text-[11px] sm:text-xs px-2.5 py-1 rounded-xl transition-all font-bold shrink-0 ${isAutoRotatingMolecule ? 'neu-btn-active' : 'neu-btn'}`}
                     title={isAutoRotatingMolecule ? "Stop Molecule Rotation" : "Auto-Rotate Molecule in 3D"}
                   >
                     {isAutoRotatingMolecule ? '⏹ Spin' : '▶ Spin'}
@@ -2071,17 +2063,17 @@ export default function PhaseConformDashboard() {
                   <button 
                     onClick={() => setIsAutoRotatingBond(!isAutoRotatingBond)} 
                     disabled={!moleculeData?.active_bond}
-                    className={`text-[11px] sm:text-xs px-2 sm:px-2.5 py-1 rounded-lg transition-all font-bold border shrink-0 ${!moleculeData?.active_bond ? 'opacity-40 cursor-not-allowed theme-card text-slate-400 border theme-border' : (isAutoRotatingBond ? 'bg-teal-500 text-white border-teal-400 shadow-sm' : 'theme-card hover:opacity-80 theme-text-main border theme-border')}`}
+                    className={`text-[11px] sm:text-xs px-2.5 py-1 rounded-xl transition-all font-bold shrink-0 ${!moleculeData?.active_bond ? 'opacity-40 cursor-not-allowed neu-card text-slate-400' : (isAutoRotatingBond ? 'neu-btn-active' : 'neu-btn')}`}
                     title={isAutoRotatingBond ? "Stop Bond Rotation" : "Auto-Rotate Active Dihedral Bond"}
                   >
                     {isAutoRotatingBond ? '⏹ Bond' : '▶ Bond'}
                   </button>
                   <button 
                     onClick={() => setShowDipole(!showDipole)} 
-                    className={`text-[11px] sm:text-xs px-2 sm:px-2.5 py-1 rounded-lg transition-all font-bold border flex items-center gap-1 shrink-0 ${
+                    className={`text-[11px] sm:text-xs px-2.5 py-1 rounded-xl transition-all font-bold flex items-center gap-1.5 shrink-0 ${
                       showDipole 
-                        ? (isDarkMode ? 'bg-sky-500/20 text-sky-300 border-sky-400/50 shadow-[0_0_12px_rgba(56,189,248,0.3)]' : 'bg-sky-100 text-sky-700 border-sky-300 shadow-sm font-bold') 
-                        : 'theme-card hover:opacity-80 theme-text-main border theme-border'
+                        ? 'neu-btn-active' 
+                        : 'neu-btn'
                     }`}
                     title="Toggle 3D Live AI Dipole Vector"
                   >
@@ -2095,7 +2087,7 @@ export default function PhaseConformDashboard() {
               <button 
                 type="button"
                 onClick={() => scrollToolbar('right')}
-                className="shrink-0 p-1 sm:px-1.5 rounded-lg theme-card border theme-border hover:opacity-100 opacity-80 hover:scale-105 active:scale-95 transition-all ml-1 shadow-sm flex items-center gap-0.5 text-pink-400 font-bold"
+                className="shrink-0 p-1.5 rounded-xl neu-btn ml-1.5 flex items-center gap-1 text-pink-400 font-bold"
                 title="Scroll Right for Spin, Bond, and Zoom Controls (or use mouse scroll wheel)"
                 aria-label="Scroll options right"
               >
@@ -2108,11 +2100,11 @@ export default function PhaseConformDashboard() {
           {/* 3D Canvas Container */}
           <div className="flex-1 w-full min-h-[220px] sm:min-h-[280px] cursor-move z-0 relative touch-none" data-tour="canvas">
             {/* Quick-Access Floating Zoom & Spin HUD */}
-            <div className="absolute top-3 right-3 z-20 flex flex-col gap-1 p-1 rounded-xl theme-panel backdrop-blur-md border theme-border shadow-lg">
+            <div className="absolute top-3 right-3 z-20 flex flex-col gap-1.5 p-1.5 rounded-2xl neu-raised">
               <button 
                 type="button"
                 onClick={handleZoomIn} 
-                className="w-7 h-7 flex items-center justify-center rounded-lg theme-card hover:opacity-80 theme-text-main border theme-border text-sm font-bold transition-all shadow-sm"
+                className="w-8 h-8 flex items-center justify-center rounded-xl neu-btn text-sm font-bold"
                 title="Zoom In (+)"
               >
                 +
@@ -2120,7 +2112,7 @@ export default function PhaseConformDashboard() {
               <button 
                 type="button"
                 onClick={handleZoomOut} 
-                className="w-7 h-7 flex items-center justify-center rounded-lg theme-card hover:opacity-80 theme-text-main border theme-border text-sm font-bold transition-all shadow-sm"
+                className="w-8 h-8 flex items-center justify-center rounded-xl neu-btn text-sm font-bold"
                 title="Zoom Out (-)"
               >
                 -
@@ -2128,7 +2120,7 @@ export default function PhaseConformDashboard() {
               <button 
                 type="button"
                 onClick={() => fitModelToWindow('current')} 
-                className="w-7 h-7 flex items-center justify-center rounded-lg theme-card hover:opacity-80 theme-text-main border theme-border text-xs font-bold transition-all shadow-sm"
+                className="w-8 h-8 flex items-center justify-center rounded-xl neu-btn text-xs font-bold"
                 title="Fit View / Reset Camera (Hotkey: F)"
               >
                 <Maximize2 className="w-3.5 h-3.5 text-indigo-400" />
@@ -2136,8 +2128,8 @@ export default function PhaseConformDashboard() {
               <button 
                 type="button"
                 onClick={() => setIsAutoRotatingMolecule(!isAutoRotatingMolecule)} 
-                className={`w-7 h-7 flex items-center justify-center rounded-lg border text-xs font-bold transition-all shadow-sm ${
-                  isAutoRotatingMolecule ? 'bg-pink-500 text-white border-pink-400 shadow-[0_0_10px_rgba(236,72,153,0.5)]' : 'theme-card hover:opacity-80 theme-text-main border theme-border'
+                className={`w-8 h-8 flex items-center justify-center rounded-xl neu-btn text-xs font-bold ${
+                  isAutoRotatingMolecule ? 'neu-btn-active' : ''
                 }`}
                 title={isAutoRotatingMolecule ? "Stop Molecule Spin" : "Auto-Spin Molecule in 3D"}
               >
@@ -2147,12 +2139,12 @@ export default function PhaseConformDashboard() {
                 <button 
                   type="button"
                   onClick={() => setIsAutoRotatingBond(!isAutoRotatingBond)} 
-                  className={`w-7 h-7 flex items-center justify-center rounded-lg border text-xs font-bold transition-all shadow-sm ${
-                    isAutoRotatingBond ? 'bg-teal-500 text-white border-teal-400 shadow-[0_0_10px_rgba(20,184,166,0.5)]' : 'theme-card hover:opacity-80 theme-text-main border theme-border'
+                  className={`w-8 h-8 flex items-center justify-center rounded-xl neu-btn text-xs font-bold ${
+                    isAutoRotatingBond ? 'neu-btn-active' : ''
                   }`}
                   title={isAutoRotatingBond ? "Stop Bond Rotation" : "Auto-Rotate Active Dihedral Bond"}
                 >
-                  <Zap className={`w-3.5 h-3.5 ${isAutoRotatingBond ? 'text-white' : 'text-teal-400'}`} />
+                  <Zap className={`w-3.5 h-3.5 ${isAutoRotatingBond ? 'text-teal-300' : 'text-teal-400'}`} />
                 </button>
               )}
             </div>
@@ -2249,17 +2241,17 @@ export default function PhaseConformDashboard() {
         }`}>
           
           {/* Panel 1: Main Dihedral Control */}
-          <div className="shrink-0 theme-panel backdrop-blur-xl rounded-2xl border theme-border p-3.5 shadow-xl relative" data-tour="dihedral-controls">
-            <div className="flex justify-between items-center mb-2">
+          <div className="shrink-0 neu-raised rounded-2xl p-3.5 relative" data-tour="dihedral-controls">
+            <div className="flex justify-between items-center mb-2.5">
               <h2 className={`text-xs font-bold ${isDarkMode ? 'text-indigo-300' : 'text-indigo-700 font-extrabold'} tracking-[0.2em] uppercase flex items-center gap-1.5`}>
                 Dihedral Angle Control
               </h2>
               {moleculeData?.active_bond ? (
-                <span className={`text-xs font-bold ${isDarkMode ? 'text-pink-300 bg-pink-500/20 border-pink-500/30' : 'text-pink-700 bg-pink-100 border-pink-300 font-extrabold'} px-3 py-1 rounded-lg border shadow-sm`}>
+                <span className={`text-xs font-bold neu-pill-inset px-3.5 py-1 ${isDarkMode ? 'text-pink-300' : 'text-pink-700 font-extrabold'}`}>
                   {angle}° — {getConformationName(angle)}
                 </span>
               ) : (
-                <span className={`text-[10px] font-bold ${isDarkMode ? 'text-slate-400 bg-slate-800 border-slate-700' : 'text-slate-600 bg-slate-100 border-slate-300'} px-3 py-1 rounded-lg border`}>
+                <span className={`text-[10px] font-bold neu-pill-inset px-3 py-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
                   LOCKED (RIGID RING)
                 </span>
               )}
@@ -2269,19 +2261,19 @@ export default function PhaseConformDashboard() {
               type="range" min="0" max="360" value={angle} 
               onChange={(e) => setAngle(Number(e.target.value))} 
               disabled={!moleculeData?.active_bond}
-              className={`w-full h-2.5 rounded-lg appearance-none cursor-pointer accent-pink-500 mb-2.5 ${moleculeData?.active_bond ? 'theme-sub' : 'bg-slate-300 dark:bg-slate-800 cursor-not-allowed opacity-50'}`} 
+              className={`w-full neu-slider mb-3 ${moleculeData?.active_bond ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'}`} 
             />
             
-            <div className="flex justify-between gap-1 sm:gap-1.5 w-full">
+            <div className="flex justify-between gap-1.5 w-full">
               {[0, 60, 120, 180, 240, 300].map(snap => (
                 <button
                   key={snap}
                   onClick={() => moleculeData?.active_bond && setAngle(snap)}
                   disabled={!moleculeData?.active_bond}
-                  className={`text-[10px] sm:text-xs font-mono py-1 px-1 sm:px-1.5 rounded-lg transition-all flex-1 text-center font-bold border ${
+                  className={`text-[10px] sm:text-xs font-mono py-1.5 px-1 sm:px-1.5 rounded-xl transition-all flex-1 text-center font-bold ${
                     angle === snap 
-                      ? 'bg-pink-500 text-white border-pink-400 shadow-sm scale-105' 
-                      : 'theme-card theme-text-main border theme-border hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed'
+                      ? 'neu-btn-active scale-105' 
+                      : 'neu-btn disabled:opacity-30 disabled:cursor-not-allowed'
                   }`}
                 >
                   {snap}°
@@ -2290,26 +2282,26 @@ export default function PhaseConformDashboard() {
             </div>
 
             {/* Real-Time AI Conformation Copilot Banner */}
-            <div className="mt-2.5 pt-2 border-t theme-border flex items-start gap-2 theme-sub p-2.5 rounded-xl border shadow-inner" data-tour="quantum-copilot">
-              <div className="p-1 rounded-lg bg-pink-500/10 border border-pink-500/30 shrink-0 mt-0.5">
+            <div className="mt-3 pt-2.5 border-t border-white/5 flex items-start gap-2.5 neu-inset p-3 rounded-2xl" data-tour="quantum-copilot">
+              <div className="p-1.5 rounded-xl neu-card shrink-0 mt-0.5">
                 <Zap className={`w-3.5 h-3.5 ${isDarkMode ? 'text-pink-400' : 'text-pink-600'} animate-pulse`} />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between gap-2 mb-1.5 flex-wrap">
+                <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className={`text-[10px] font-bold tracking-wider uppercase ${isDarkMode ? 'text-pink-300' : 'text-pink-700'} flex items-center gap-1`}>
                       AI Conformation Copilot
-                      <span className={`text-[9px] ${isDarkMode ? 'bg-teal-400/10 text-teal-300 border-teal-400/20' : 'bg-teal-50 text-teal-700 border-teal-200 font-bold'} px-1.5 py-0.2 rounded border font-mono`}>Live 60fps</span>
+                      <span className={`text-[9px] neu-pill-inset px-2 py-0.5 font-mono ${isDarkMode ? 'text-teal-300' : 'text-teal-700 font-bold'}`}>Live 60fps</span>
                     </span>
 
                     {/* Mode Selector: Simplified vs Descriptive */}
-                    <div className="flex items-center theme-card p-0.5 rounded-lg border theme-border shadow-inner">
+                    <div className="flex items-center neu-inset p-0.5 rounded-xl">
                       <button
                         onClick={() => setCopilotMode('simplified')}
-                        className={`px-2 py-0.5 rounded text-[9px] font-bold transition-all ${
+                        className={`px-2.5 py-1 rounded-lg text-[9px] font-bold transition-all ${
                           copilotMode === 'simplified' 
-                            ? 'bg-pink-500 text-white shadow-sm' 
-                            : 'theme-text-muted hover:theme-text-main'
+                            ? 'neu-btn-active' 
+                            : 'neu-btn opacity-70 hover:opacity-100'
                         }`}
                         title="Intuitive, high-level physical reasoning of why changes are occurring"
                       >
@@ -2317,10 +2309,10 @@ export default function PhaseConformDashboard() {
                       </button>
                       <button
                         onClick={() => setCopilotMode('descriptive')}
-                        className={`px-2 py-0.5 rounded text-[9px] font-bold transition-all ${
+                        className={`px-2.5 py-1 rounded-lg text-[9px] font-bold transition-all ${
                           copilotMode === 'descriptive' 
-                            ? 'bg-purple-500 text-white shadow-sm' 
-                            : 'theme-text-muted hover:theme-text-main'
+                            ? 'neu-btn-active' 
+                            : 'neu-btn opacity-70 hover:opacity-100'
                         }`}
                         title="Precise, molecule-specific quantum and physical chemistry mechanics"
                       >
@@ -2338,12 +2330,12 @@ export default function PhaseConformDashboard() {
 
                 <div className="text-[11px] theme-text-sub leading-relaxed font-sans">
                   {copilotMode === 'simplified' ? (
-                    <div className="theme-card p-2 rounded-lg border theme-border theme-text-main shadow-sm">
+                    <div className="neu-card p-3 rounded-xl theme-text-main">
                       <ScientificFormatter text={aiCopilotInsight.simplified} isDarkMode={isDarkMode} />
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <div className="theme-card p-2 rounded-lg border theme-border theme-text-main font-sans shadow-sm">
+                      <div className="neu-card p-3 rounded-xl theme-text-main font-sans">
                         <ScientificFormatter text={aiCopilotInsight.descriptive} isDarkMode={isDarkMode} />
                       </div>
 
@@ -2352,10 +2344,10 @@ export default function PhaseConformDashboard() {
                         <button
                           onClick={handleRequestDeepDive}
                           disabled={isDeepDiveLoading}
-                          className={`flex items-center gap-1.5 text-[10px] font-bold ${isDarkMode ? 'text-purple-300 bg-purple-500/20 hover:bg-purple-500/30 border-purple-500/30' : 'text-purple-700 bg-purple-100 hover:bg-purple-200 border-purple-300'} px-2 py-1 rounded-md transition-all border disabled:opacity-50`}
+                          className="flex items-center gap-1.5 text-[10px] font-bold neu-btn px-3 py-1.5 rounded-xl transition-all text-purple-400 hover:text-purple-300 disabled:opacity-50"
                           title="Generate a custom quantum chemical deep dive from Gemini 3.8 Flash"
                         >
-                          <Zap className={`w-3 h-3 ${isDarkMode ? 'text-purple-400' : 'text-purple-600'} ${isDeepDiveLoading ? 'animate-spin' : ''}`} />
+                          <Zap className={`w-3.5 h-3.5 text-purple-400 ${isDeepDiveLoading ? 'animate-spin' : ''}`} />
                           {isDeepDiveLoading ? "Computing with Gemini 3.8..." : "Ask Gemini 3.8 Flash Quantum Deep-Dive"}
                         </button>
                         {geminiDeepDive && (
@@ -2370,7 +2362,7 @@ export default function PhaseConformDashboard() {
 
                       {/* Real-Time Live Calculating Feedback (Never looks stuck) */}
                       {isDeepDiveLoading && (
-                        <div className="theme-card p-3 rounded-lg border border-purple-500/40 text-[10.5px] theme-text-main shadow-md space-y-2 animate-in fade-in">
+                        <div className="neu-card p-3.5 rounded-xl text-[10.5px] theme-text-main space-y-2.5 animate-in fade-in">
                           <div className="flex items-center justify-between">
                             <span className={`text-[9.5px] font-bold uppercase tracking-wider ${isDarkMode ? 'text-purple-400' : 'text-purple-700'} flex items-center gap-1.5`}>
                               <Zap className="w-3.5 h-3.5 text-purple-500 animate-bounce" />
@@ -2381,7 +2373,7 @@ export default function PhaseConformDashboard() {
                           <p className="text-[10px] theme-text-muted italic">
                             Analyzing σ → σ* hyperconjugation, Pauli steric repulsion & instantaneous dipole vector...
                           </p>
-                          <div className="h-1.5 w-full bg-purple-500/20 rounded-full overflow-hidden">
+                          <div className="h-2 w-full neu-inset rounded-full overflow-hidden">
                             <div className="h-full bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-500 animate-pulse w-3/4 rounded-full"></div>
                           </div>
                         </div>
@@ -2389,14 +2381,14 @@ export default function PhaseConformDashboard() {
 
                       {/* Completed Quantum Analysis Result */}
                       {geminiDeepDive && !isDeepDiveLoading && (
-                        <div className="theme-card p-3 rounded-lg border theme-border text-[10.5px] theme-text-main leading-relaxed animate-in fade-in shadow-md space-y-1.5">
+                        <div className="neu-card p-3.5 rounded-xl text-[10.5px] theme-text-main leading-relaxed animate-in fade-in space-y-2">
                           <div className="flex items-center justify-between">
                             <span className={`text-[9.5px] font-bold uppercase tracking-wider ${isDarkMode ? 'text-purple-400' : 'text-purple-700'} flex items-center gap-1.5`}>
                               <Zap className="w-3 h-3 text-purple-500" />
                               Gemini 3.8 Flash Quantum Conformation Analysis:
                             </span>
                             {deepDiveMeta && (
-                              <span className={`text-[8.5px] font-mono px-1.5 py-0.5 rounded border ${isDarkMode ? 'bg-purple-950/60 border-purple-800/40 text-purple-300' : 'bg-purple-50 border-purple-200 text-purple-700'}`}>
+                              <span className={`text-[8.5px] font-mono neu-pill-inset px-2 py-0.5 ${isDarkMode ? 'text-purple-300' : 'text-purple-700'}`}>
                                 {deepDiveMeta.cached ? '⚡ Cached (0ms)' : `🚀 ${deepDiveMeta.latencyMs}ms`}
                               </span>
                             )}
@@ -2414,16 +2406,14 @@ export default function PhaseConformDashboard() {
           </div>
 
           {/* Panel 2: Energy Surface & Boltzmann (Compact length) */}
-          <div className="shrink-0 h-[210px] theme-panel backdrop-blur-xl rounded-2xl border theme-border p-3 shadow-xl relative overflow-hidden group flex flex-col" data-tour="energy-chart">
-            <div className="absolute inset-0 bg-gradient-to-br from-indigo-300/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-            
+          <div className="shrink-0 h-[215px] neu-raised rounded-2xl p-3.5 relative overflow-hidden group flex flex-col" data-tour="energy-chart">
             <div className="flex justify-between items-center mb-1 shrink-0">
               <h2 className={`text-[11px] font-bold ${isDarkMode ? 'text-indigo-300/80' : 'text-indigo-800 font-extrabold'} tracking-widest uppercase`}>Energy Surface & Boltzmann</h2>
               <div className="flex items-center gap-1.5">
-                <span className={`text-[9px] font-bold ${isDarkMode ? 'bg-purple-400/10 text-purple-300 border-purple-400/20' : 'bg-purple-100 text-purple-700 border-purple-200'} px-1.5 py-0.5 rounded border flex items-center gap-1`}>
+                <span className={`text-[9px] font-bold neu-pill-inset px-2 py-0.5 flex items-center gap-1 ${isDarkMode ? 'text-purple-300' : 'text-purple-700'}`}>
                   <span className={`w-2 h-0.5 ${isDarkMode ? 'bg-[#c084fc]' : 'bg-[#9333ea]'} inline-block`}></span> MMFF94
                 </span>
-                <span className={`text-[9px] font-bold ${isDarkMode ? 'bg-teal-400/10 text-teal-300 border-teal-400/20' : 'bg-teal-100 text-teal-700 border-teal-200'} px-1.5 py-0.5 rounded border flex items-center gap-1`}>
+                <span className={`text-[9px] font-bold neu-pill-inset px-2 py-0.5 flex items-center gap-1 ${isDarkMode ? 'text-teal-300' : 'text-teal-700'}`}>
                   <span className="w-2 h-0.5 inline-block" style={{ backgroundColor: currentTheme.chartEnergy }}></span> SPICE AI (R²=0.99)
                 </span>
               </div>
@@ -2442,7 +2432,7 @@ export default function PhaseConformDashboard() {
                   <YAxis yAxisId="left" stroke={isDarkMode ? '#475569' : '#94a3b8'} tick={{fill: isDarkMode ? '#94a3b8' : '#334155', fontSize: 10, fontFamily: 'monospace', fontWeight: 600}} />
                   <YAxis yAxisId="right" orientation="right" hide />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: currentTheme.cardBg, border: `1px solid ${currentTheme.borderColor}`, borderRadius: '10px', backdropFilter: 'blur(10px)', padding: '6px 10px', color: currentTheme.textMain }}
+                    contentStyle={{ backgroundColor: currentTheme.cardBg, border: `1px solid ${currentTheme.borderColor}`, borderRadius: '12px', boxShadow: '5px 5px 12px rgba(0,0,0,0.5)', padding: '6px 10px', color: currentTheme.textMain }}
                     itemStyle={{ color: currentTheme.accentPrimary, fontSize: '11px', fontFamily: 'monospace', fontWeight: 'bold' }}
                     formatter={(value, name) => {
                       if (name === 'energy') return [`${Number(value).toFixed(2)} kJ/mol (${(Number(value)/4.184).toFixed(2)} kcal/mol)`, 'MMFF94 Energy (ΔE)'];
@@ -2479,7 +2469,7 @@ export default function PhaseConformDashboard() {
 
           {/* Panel 3: AI Deep Learning Section */}
           {aiMetrics && (
-            <div className="shrink-0 theme-panel backdrop-blur-xl rounded-2xl border theme-border p-3 shadow-xl relative transition-all duration-300">
+            <div className="shrink-0 neu-raised rounded-2xl p-3.5 relative transition-all duration-300">
               <div 
                 onClick={() => setIsAiMetricsMinimized(prev => !prev)}
                 className="flex justify-between items-center cursor-pointer select-none group/hdr"
@@ -2490,19 +2480,19 @@ export default function PhaseConformDashboard() {
                     AI Deep Learning (ChemGNN ONNX)
                   </h2>
                   {isAiMetricsMinimized && (
-                    <span className={`text-[10px] font-mono font-bold ${isDarkMode ? 'text-pink-300 bg-pink-500/10 border-pink-500/20' : 'text-pink-700 bg-pink-50 border-pink-200'} px-2 py-0.5 rounded border`}>
+                    <span className={`text-[10px] font-mono font-bold neu-pill-inset px-2.5 py-0.5 ${isDarkMode ? 'text-pink-300' : 'text-pink-700'}`}>
                       {aiMetrics.energy} kcal/mol • μ: {liveDipole?.magnitude !== undefined ? `${liveDipole.magnitude.toFixed(2)} D` : '0.00 D'}
                     </span>
                   )}
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <span className={`text-[10px] font-mono font-bold ${isDarkMode ? 'text-pink-300 bg-pink-500/10 border-pink-500/20' : 'text-pink-700 bg-pink-50 border-pink-200'} px-2 py-0.5 rounded border`}>
+                <div className="flex items-center gap-2">
+                  <span className={`text-[10px] font-mono font-bold neu-pill-inset px-2 py-0.5 ${isDarkMode ? 'text-pink-300' : 'text-pink-700'}`}>
                     &lt;10ms
                   </span>
                   <button 
                     type="button"
                     onClick={(e) => { e.stopPropagation(); setIsAiMetricsMinimized(prev => !prev); }}
-                    className={`${isDarkMode ? 'text-indigo-300/70 hover:text-white hover:bg-white/10' : 'theme-text-muted hover:theme-text-main hover:bg-black/5'} p-1 rounded-lg transition-colors flex items-center gap-1 text-[10px] font-bold`}
+                    className="neu-btn p-1.5 rounded-xl transition-colors flex items-center gap-1 text-[10px] font-bold"
                     title={isAiMetricsMinimized ? "Expand AI Deep Learning HUD" : "Minimize AI Deep Learning HUD"}
                   >
                     {isAiMetricsMinimized ? (
@@ -2521,19 +2511,19 @@ export default function PhaseConformDashboard() {
               </div>
               
               {!isAiMetricsMinimized && (
-                <div className="mt-2.5">
-                  <div className="grid grid-cols-3 gap-2 mb-2.5">
-                    <div className="theme-sub p-2 rounded-xl border theme-border flex flex-col justify-center shadow-sm">
+                <div className="mt-3">
+                  <div className="grid grid-cols-3 gap-2.5 mb-3">
+                    <div className="neu-card p-2.5 rounded-xl flex flex-col justify-center">
                       <span className="text-[9px] font-medium theme-text-muted uppercase tracking-wider block">ChemGNN Energy</span>
                       <span className="font-mono text-base font-bold theme-text-main">{aiMetrics.energy} <span className={`text-[10px] ${isDarkMode ? 'text-pink-300' : 'text-pink-600'}`}>kcal/mol</span></span>
                       <span className="text-[9px] theme-text-muted font-mono">{(Number(aiMetrics.energy) * 4.184).toFixed(1)} kJ/mol</span>
                     </div>
-                    <div className="theme-sub p-2 rounded-xl border theme-border flex flex-col justify-center shadow-sm">
+                    <div className="neu-card p-2.5 rounded-xl flex flex-col justify-center">
                       <span className="text-[9px] font-medium theme-text-muted uppercase tracking-wider block">Equilibrium Dipole</span>
                       <span className="font-mono text-xs font-bold truncate theme-text-main">[{aiMetrics.dipole.join(', ')}]</span>
                       <span className="text-[9px] theme-text-muted font-mono">Ground State</span>
                     </div>
-                    <div className="theme-sub p-2 rounded-xl border theme-border flex flex-col justify-center shadow-inner">
+                    <div className="neu-card p-2.5 rounded-xl flex flex-col justify-center">
                       <span className={`text-[9px] font-medium ${isDarkMode ? 'text-sky-300' : 'text-sky-700 font-bold'} uppercase tracking-wider flex items-center gap-1`}>
                         <Zap className={`w-2.5 h-2.5 ${isDarkMode ? 'text-sky-400' : 'text-sky-600'}`} />
                         Live Dipole (θ)
@@ -2548,10 +2538,10 @@ export default function PhaseConformDashboard() {
                   </div>
 
                   <div>
-                    <span className="text-[10px] font-medium theme-text-muted uppercase tracking-widest block mb-1.5">Atomic Charges (Quantum / Gasteiger)</span>
-                    <div className="flex gap-1.5 overflow-x-auto max-w-full pb-1 custom-scrollbar">
+                    <span className="text-[10px] font-medium theme-text-muted uppercase tracking-widest block mb-2">Atomic Charges (Quantum / Gasteiger)</span>
+                    <div className="flex gap-2 overflow-x-auto max-w-full pb-1 custom-scrollbar">
                       {aiMetrics.charges.slice(0, 16).map((c, i) => (
-                        <div key={i} className="theme-sub px-2 py-1 rounded-lg border theme-border flex flex-col items-center shrink-0 min-w-[42px] shadow-sm">
+                        <div key={i} className="neu-card px-2.5 py-1.5 rounded-xl flex flex-col items-center shrink-0 min-w-[44px]">
                           <span className="text-[10px] theme-text-main font-bold">{moleculeData?.atoms[i]?.symbol || 'Atom'}</span>
                           <span className={`font-mono text-[10px] font-bold ${c > 0 ? (isDarkMode ? 'text-pink-300' : 'text-pink-600') : (isDarkMode ? 'text-teal-300' : 'text-teal-600')}`}>{Number(c).toFixed(2)}</span>
                         </div>
@@ -2565,7 +2555,7 @@ export default function PhaseConformDashboard() {
 
           {/* Panel 4: Thermodynamic Extrema & Rotational Barrier */}
           {extremaMetrics && (
-            <div className="shrink-0 theme-panel backdrop-blur-xl rounded-2xl border theme-border p-3 shadow-xl relative transition-all duration-300">
+            <div className="shrink-0 neu-raised rounded-2xl p-3.5 relative transition-all duration-300">
               <div 
                 onClick={() => setIsExtremaMinimized(prev => !prev)}
                 className="flex justify-between items-center cursor-pointer select-none group/hdr"
@@ -2575,19 +2565,19 @@ export default function PhaseConformDashboard() {
                     Thermodynamic Extrema & Barrier
                   </h2>
                   {isExtremaMinimized && (
-                    <span className={`text-[10px] font-mono font-bold ${isDarkMode ? 'text-teal-300 bg-teal-500/10 border-teal-500/20' : 'text-teal-700 bg-teal-50 border-teal-200'} px-2 py-0.5 rounded border`}>
+                    <span className={`text-[10px] font-mono font-bold neu-pill-inset px-2.5 py-0.5 ${isDarkMode ? 'text-teal-300' : 'text-teal-700'}`}>
                       ΔE‡: {extremaMetrics.barrier.toFixed(2)} kJ/mol ({(extremaMetrics.barrier / 4.184).toFixed(2)} kcal)
                     </span>
                   )}
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <span className={`text-[10px] font-bold ${isDarkMode ? 'bg-purple-400/10 text-purple-300 border-purple-400/20' : 'bg-purple-100 text-purple-700 border-purple-200'} px-2 py-0.5 rounded border`}>
+                <div className="flex items-center gap-2">
+                  <span className={`text-[10px] font-bold neu-pill-inset px-2 py-0.5 ${isDarkMode ? 'text-purple-300' : 'text-purple-700'}`}>
                     ΔE‡ Barrier
                   </span>
                   <button 
                     type="button"
                     onClick={(e) => { e.stopPropagation(); setIsExtremaMinimized(prev => !prev); }}
-                    className={`${isDarkMode ? 'text-indigo-300/70 hover:text-white hover:bg-white/10' : 'theme-text-muted hover:theme-text-main hover:bg-black/5'} p-1 rounded-lg transition-colors flex items-center gap-1 text-[10px] font-bold`}
+                    className="neu-btn p-1.5 rounded-xl transition-colors flex items-center gap-1 text-[10px] font-bold"
                     title={isExtremaMinimized ? "Expand Extrema & Barrier HUD" : "Minimize Extrema & Barrier HUD"}
                   >
                     {isExtremaMinimized ? (
@@ -2606,33 +2596,33 @@ export default function PhaseConformDashboard() {
               </div>
               
               {!isExtremaMinimized && (
-                <div className="mt-2.5">
-                  <div className="grid grid-cols-3 gap-2 mb-3 text-center">
-                    <div className="theme-card p-2 rounded-xl border theme-border shadow-sm">
+                <div className="mt-3">
+                  <div className="grid grid-cols-3 gap-2.5 mb-3 text-center">
+                    <div className="neu-card p-2.5 rounded-xl">
                       <span className="text-[9px] font-bold theme-text-muted uppercase tracking-widest block mb-0.5">Min ({extremaMetrics.min.angle}°)</span>
                       <span className={`font-mono text-sm font-bold ${isDarkMode ? 'text-indigo-300' : 'text-indigo-700 font-extrabold'}`}>{extremaMetrics.min.energy.toFixed(2)} <span className="text-[10px]">kJ/mol</span></span>
                       <span className="text-[9px] theme-text-muted block">{(extremaMetrics.min.energy / 4.184).toFixed(2)} kcal</span>
                     </div>
-                    <div className="theme-card p-2 rounded-xl border theme-border shadow-sm">
+                    <div className="neu-card p-2.5 rounded-xl">
                       <span className="text-[9px] font-bold theme-text-muted uppercase tracking-widest block mb-0.5">Max ({extremaMetrics.max.angle}°)</span>
                       <span className={`font-mono text-sm font-bold ${isDarkMode ? 'text-purple-300' : 'text-purple-700 font-extrabold'}`}>{extremaMetrics.max.energy.toFixed(2)} <span className="text-[10px]">kJ/mol</span></span>
                       <span className="text-[9px] theme-text-muted block">{(extremaMetrics.max.energy / 4.184).toFixed(2)} kcal</span>
                     </div>
-                    <div className="theme-card p-2 rounded-xl border theme-border shadow-sm">
+                    <div className="neu-card p-2.5 rounded-xl">
                       <span className="text-[9px] font-bold theme-text-muted uppercase tracking-widest block mb-0.5">Barrier ΔE‡</span>
                       <span className={`font-mono text-sm font-bold ${isDarkMode ? 'text-teal-300' : 'text-teal-700 font-extrabold'}`}>{extremaMetrics.barrier.toFixed(2)} <span className="text-[10px]">kJ/mol</span></span>
                       <span className="text-[9px] theme-text-muted block">{(extremaMetrics.barrier / 4.184).toFixed(2)} kcal</span>
                     </div>
                   </div>
 
-                  <div className="space-y-1">
+                  <div className="space-y-1.5">
                     <div className="flex justify-between text-[11px] font-mono theme-text-sub">
                       <span>Min ({extremaMetrics.min.angle}°)</span>
                       <span className={`${isDarkMode ? 'text-pink-300' : 'text-pink-600'} font-bold`}>{currentEnergy.toFixed(2)} kJ/mol ({(currentEnergy / 4.184).toFixed(2)} kcal) • {extremaMetrics.currentPercent.toFixed(0)}%</span>
                       <span>Max ({extremaMetrics.max.angle}°)</span>
                     </div>
-                    <div className="w-full h-2.5 theme-sub rounded-full overflow-hidden border theme-border relative shadow-inner">
-                      <div className="absolute top-0 left-0 h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 transition-all duration-300" style={{ width: `${extremaMetrics.currentPercent}%` }}></div>
+                    <div className="w-full h-3 neu-inset rounded-full overflow-hidden relative">
+                      <div className="absolute top-0 left-0 h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 transition-all duration-300 rounded-full shadow-[0_0_8px_rgba(236,72,153,0.5)]" style={{ width: `${extremaMetrics.currentPercent}%` }}></div>
                     </div>
                   </div>
                 </div>
@@ -2646,14 +2636,14 @@ export default function PhaseConformDashboard() {
       {/* Ketcher Draw Modal */}
       {isDrawing && (
         <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 xl:p-12">
-          <div className={`${isDarkMode ? 'bg-[#1e1e2f] border-indigo-200/20' : 'bg-white border-slate-200'} w-full max-w-6xl h-full max-h-[94dvh] sm:max-h-[800px] rounded-2xl shadow-2xl overflow-hidden flex flex-col border relative`}>
+          <div className="neu-raised-lg w-full max-w-6xl h-full max-h-[94dvh] sm:max-h-[800px] rounded-3xl overflow-hidden flex flex-col relative">
             <button 
               onClick={() => setIsDrawing(false)}
-              className={`absolute top-4 right-4 z-10 ${isDarkMode ? 'bg-[#2a2a35] hover:bg-[#3f3f5a] text-indigo-200' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'} p-2 rounded-full transition-colors`}
+              className="absolute top-4 right-4 z-10 neu-btn p-2 rounded-full transition-colors text-slate-300 hover:text-white"
             >
               <X className="w-5 h-5" />
             </button>
-            <div className={`${isDarkMode ? 'bg-[#141423] border-indigo-200/10' : 'bg-slate-50 border-slate-200'} p-4 border-b`}>
+            <div className="p-4 border-b border-white/5 neu-inset rounded-t-3xl">
               <h2 className={`text-xl font-bold ${isDarkMode ? 'text-indigo-100' : 'text-slate-800'} flex items-center gap-2`}>
                 <Zap className="w-5 h-5 text-purple-500" />
                 Molecular Editor
@@ -2686,68 +2676,68 @@ export default function PhaseConformDashboard() {
       {/* Gemini AI Floating Assistant */}
       <div className={`fixed bottom-3 right-3 sm:bottom-6 sm:right-6 z-[90] flex flex-col items-end transition-all duration-500 ${chatOpen ? 'w-[calc(100vw-24px)] sm:w-80 max-w-sm h-[480px] max-h-[75dvh]' : 'w-12 h-12 sm:w-14 sm:h-14'}`}>
         {/* Chat Window */}
-        <div className={`w-full h-full theme-panel backdrop-blur-xl border border-pink-500/30 rounded-2xl shadow-[0_0_40px_rgba(244,114,182,0.15)] flex flex-col overflow-hidden transition-all duration-500 origin-bottom-right ${chatOpen ? 'scale-100 opacity-100 mb-2 sm:mb-4' : 'scale-0 opacity-0 absolute bottom-0 right-0 pointer-events-none'}`}>
-          <div className={`bg-gradient-to-r ${isDarkMode ? 'from-pink-500/20 to-purple-500/20 border-pink-500/20' : 'from-pink-100 to-purple-100 border-pink-200'} border-b p-3 flex justify-between items-center`}>
+        <div className={`w-full h-full neu-raised-lg rounded-3xl flex flex-col overflow-hidden transition-all duration-500 origin-bottom-right ${chatOpen ? 'scale-100 opacity-100 mb-2 sm:mb-4' : 'scale-0 opacity-0 absolute bottom-0 right-0 pointer-events-none'}`}>
+          <div className="p-3.5 neu-inset rounded-t-3xl border-b border-white/5 flex justify-between items-center">
             <h3 className={`text-xs font-bold ${isDarkMode ? 'text-pink-300' : 'text-pink-700 font-extrabold'} tracking-[0.1em] flex items-center gap-2`}>
-              <Zap className="w-3 h-3 text-pink-500" />
+              <Zap className="w-3.5 h-3.5 text-pink-500" />
               Gemini 3.8 Flash Co-Pilot
             </h3>
             <div className="flex items-center gap-2">
               <button 
                 type="button"
                 onClick={() => setIsVoiceReplyEnabled(!isVoiceReplyEnabled)}
-                className={`p-1 rounded-md transition-colors ${
+                className={`p-1.5 rounded-xl transition-colors neu-btn ${
                   isVoiceReplyEnabled 
-                    ? (isDarkMode ? 'text-pink-400 bg-pink-500/20 hover:bg-pink-500/30' : 'text-pink-700 bg-pink-100 hover:bg-pink-200') 
-                    : (isDarkMode ? 'text-indigo-300/60 hover:text-indigo-200' : 'theme-text-muted hover:theme-text-main')
+                    ? 'neu-btn-active text-pink-400' 
+                    : 'text-slate-400'
                 }`}
                 title={isVoiceReplyEnabled ? "Voice Speech Reply: Enabled (Gemini reads answers aloud)" : "Voice Speech Reply: Disabled (Click to enable)"}
               >
                 {isVoiceReplyEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
               </button>
-              <button onClick={() => setChatOpen(false)} className={`${isDarkMode ? 'text-indigo-300 hover:text-white' : 'theme-text-muted hover:theme-text-main'} transition-colors`}>
-                <X className="w-4 h-4" />
+              <button onClick={() => setChatOpen(false)} className="neu-btn p-1.5 rounded-xl text-slate-400 hover:text-white transition-colors">
+                <X className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
-          <div className="flex-1 overflow-y-auto p-3 sm:p-4 flex flex-col gap-3 custom-scrollbar" ref={chatScrollRef}>
+          <div className="flex-1 overflow-y-auto p-3.5 sm:p-4 flex flex-col gap-3 custom-scrollbar" ref={chatScrollRef}>
             {chatHistory.map((msg, i) => (
-              <div key={i} className={`max-w-[85%] rounded-xl p-3 text-[11px] ${msg.role === 'user' ? (isDarkMode ? 'bg-indigo-500/30 text-indigo-100 self-end rounded-br-sm' : 'bg-indigo-600 text-white self-end rounded-br-sm shadow-sm') : 'theme-card theme-text-main border theme-border self-start rounded-bl-sm shadow-sm'}`}>
+              <div key={i} className={`max-w-[85%] rounded-2xl p-3 text-[11px] font-sans ${msg.role === 'user' ? (isDarkMode ? 'neu-btn self-end rounded-br-sm text-indigo-100' : 'bg-indigo-600 text-white self-end rounded-br-sm shadow-md') : 'neu-card theme-text-main self-start rounded-bl-sm'}`}>
                 <ScientificFormatter text={msg.text} isDarkMode={isDarkMode} />
               </div>
             ))}
             {isChatLoading && (
-              <div className="theme-card theme-text-main border theme-border self-start rounded-xl rounded-bl-sm p-3 text-[11px] flex gap-1 items-center shadow-sm">
-                <span className="w-1.5 h-1.5 bg-pink-500 rounded-full animate-bounce"></span>
-                <span className="w-1.5 h-1.5 bg-pink-500 rounded-full animate-bounce" style={{animationDelay: '0.15s'}}></span>
-                <span className="w-1.5 h-1.5 bg-pink-500 rounded-full animate-bounce" style={{animationDelay: '0.3s'}}></span>
+              <div className="neu-card theme-text-main self-start rounded-2xl rounded-bl-sm p-3 text-[11px] flex gap-1.5 items-center">
+                <span className="w-2 h-2 bg-pink-500 rounded-full animate-bounce"></span>
+                <span className="w-2 h-2 bg-pink-500 rounded-full animate-bounce" style={{animationDelay: '0.15s'}}></span>
+                <span className="w-2 h-2 bg-pink-500 rounded-full animate-bounce" style={{animationDelay: '0.3s'}}></span>
               </div>
             )}
           </div>
-          <form onSubmit={handleChatSubmit} className="p-2.5 sm:p-3 theme-sub border-t theme-border flex gap-1.5 items-center">
+          <form onSubmit={handleChatSubmit} className="p-2.5 sm:p-3 neu-inset rounded-b-3xl border-t border-white/5 flex gap-2 items-center">
             <input 
               type="text" 
               value={chatInput}
               onChange={e => setChatInput(e.target.value)}
               placeholder={isListening ? "Listening... Speak, then pause to auto-submit..." : "Ask Gemini or speak to rotate bond..."}
-              className={`flex-1 ${isDarkMode ? 'bg-[#1e1e2f] text-white border-white/5 focus:border-pink-500/50' : 'theme-card theme-text-main border theme-border focus:border-pink-500 shadow-inner'} border rounded-lg px-2.5 sm:px-3 py-1.5 text-[11px] outline-none transition-all ${
-                isListening ? 'border-red-500/80 bg-red-950/20 placeholder-red-400 ring-1 ring-red-500/30' : ''
+              className={`flex-1 neu-inset rounded-xl px-3 py-2 text-[11px] outline-none transition-all ${
+                isListening ? 'border border-red-500 text-red-400 placeholder-red-400 ring-1 ring-red-500/30' : ''
               }`}
             />
             {/* Voice Input Microphone Button */}
             <button
               type="button"
               onClick={toggleListening}
-              className={`p-1.5 rounded-lg border transition-all shrink-0 ${
+              className={`p-2 rounded-xl neu-btn transition-all shrink-0 ${
                 isListening 
-                  ? 'bg-red-500/30 border-red-500 text-red-400 animate-pulse shadow-[0_0_12px_rgba(239,68,68,0.5)]' 
-                  : (isDarkMode ? 'bg-[#1e1e2f] border-white/10 text-indigo-300 hover:text-white hover:border-pink-500/40' : 'theme-card border theme-border theme-text-main hover:opacity-80')
+                  ? 'neu-btn-active text-red-400 animate-pulse' 
+                  : 'text-indigo-300 hover:text-white'
               }`}
               title={isListening ? "Listening... Click to stop" : "Speak to Gemini with Voice Input"}
             >
               {isListening ? <MicOff className="w-4 h-4 text-red-500" /> : <Mic className="w-4 h-4" />}
             </button>
-            <button type="submit" disabled={isChatLoading || !chatInput.trim()} className="bg-pink-500/80 hover:bg-pink-400 text-white p-1.5 rounded-lg transition-colors disabled:opacity-50 shrink-0">
+            <button type="submit" disabled={isChatLoading || !chatInput.trim()} className="neu-btn text-pink-400 p-2 rounded-xl transition-colors disabled:opacity-50 shrink-0">
               <Zap className="w-4 h-4" />
             </button>
           </form>
@@ -2757,10 +2747,10 @@ export default function PhaseConformDashboard() {
         <button 
           data-tour="gemini-copilot"
           onClick={() => setChatOpen(!chatOpen)}
-          className={`absolute bottom-0 right-0 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-[0_0_30px_rgba(244,114,182,0.4)] flex items-center justify-center transition-transform hover:scale-110 active:scale-95 group ${chatOpen ? 'scale-0 opacity-0 pointer-events-none' : 'scale-100 opacity-100'}`}
+          className={`absolute bottom-0 right-0 w-12 h-12 sm:w-14 sm:h-14 rounded-full neu-btn flex items-center justify-center transition-transform hover:scale-110 active:scale-95 group ${chatOpen ? 'scale-0 opacity-0 pointer-events-none' : 'scale-100 opacity-100'}`}
           title="Open Gemini 3.8 Flash AI Co-Pilot Assistant"
         >
-          <Zap className="w-5 h-5 sm:w-6 sm:h-6 animate-pulse" />
+          <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-pink-400 animate-pulse" />
           <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-pink-500 border border-white/40"></span>

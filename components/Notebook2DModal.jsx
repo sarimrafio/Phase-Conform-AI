@@ -567,16 +567,12 @@ CONFORMATION & STEREOCENTER SUMMARY:
   return (
     <div className="fixed inset-0 z-[110] bg-black/70 backdrop-blur-md flex items-center justify-center p-1.5 sm:p-4 lg:p-6 animate-in fade-in duration-200">
       <div 
-        className={`w-full max-w-5xl h-[95dvh] max-h-[96dvh] sm:h-auto sm:max-h-[94vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col border transition-all duration-300 relative ${
-          isDarkMode ? 'bg-[#181825] border-indigo-500/30 text-slate-100' : 'bg-white border-slate-300 text-slate-900'
-        }`}
+        className="w-full max-w-5xl h-[95dvh] max-h-[96dvh] sm:h-auto sm:max-h-[94vh] rounded-3xl neu-raised-lg overflow-hidden flex flex-col transition-all duration-300 relative"
       >
         {/* Header Bar */}
-        <div className={`p-3 sm:p-4 border-b flex items-center justify-between gap-2.5 sm:gap-3 shrink-0 ${
-          isDarkMode ? 'bg-[#12121e] border-indigo-500/20' : 'bg-slate-50 border-slate-200'
-        }`}>
+        <div className="p-3.5 sm:p-4 border-b border-white/5 neu-inset rounded-t-3xl flex items-center justify-between gap-2.5 sm:gap-3 shrink-0">
           <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center shadow-md text-white shrink-0">
+            <div className="w-9 h-9 rounded-xl neu-card flex items-center justify-center text-pink-400 shrink-0">
               <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div className="min-w-0">
@@ -584,7 +580,7 @@ CONFORMATION & STEREOCENTER SUMMARY:
                 <h2 className="text-sm sm:text-base md:text-lg font-bold tracking-tight flex items-center gap-1.5 truncate">
                   2D Chemistry Lab Notebook
                 </h2>
-                <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-mono font-bold bg-indigo-500/20 text-indigo-400 border border-indigo-400/30 shrink-0">
+                <span className="text-[10px] sm:text-xs neu-pill-inset px-2.5 py-0.5 font-mono font-bold text-indigo-400 shrink-0">
                   {formula} ({smiles})
                 </span>
               </div>
@@ -596,9 +592,7 @@ CONFORMATION & STEREOCENTER SUMMARY:
 
           <button 
             onClick={onClose}
-            className={`p-1.5 sm:p-2 rounded-xl transition-colors shrink-0 ${
-              isDarkMode ? 'bg-white/5 hover:bg-white/10 text-slate-300' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-            }`}
+            className="neu-btn p-2 rounded-xl text-slate-300 hover:text-white shrink-0"
             title="Close Notebook Inspector (Esc)"
           >
             <X className="w-5 h-5" />
@@ -606,16 +600,14 @@ CONFORMATION & STEREOCENTER SUMMARY:
         </div>
 
         {/* Tab Controls Bar */}
-        <div className={`px-2 sm:px-3 py-1.5 sm:py-2 border-b flex items-center justify-between gap-1.5 shrink-0 overflow-x-auto no-scrollbar mobile-touch-scroll ${
-          isDarkMode ? 'bg-[#161626] border-white/5' : 'bg-slate-100/70 border-slate-200'
-        }`}>
-          <div className="flex items-center gap-1 p-0.5 sm:p-1 rounded-xl bg-black/20 border border-white/5 overflow-x-auto no-scrollbar mobile-touch-scroll max-w-full flex-nowrap shrink-0">
+        <div className="px-2.5 sm:px-3 py-2 border-b border-white/5 neu-inset flex items-center justify-between gap-2 shrink-0 overflow-x-auto no-scrollbar mobile-touch-scroll">
+          <div className="flex items-center gap-1.5 p-1 rounded-2xl neu-inset overflow-x-auto no-scrollbar mobile-touch-scroll max-w-full flex-nowrap shrink-0">
             <button
               onClick={() => setActiveTab('skeletal')}
-              className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 ${
+              className={`px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 ${
                 activeTab === 'skeletal'
-                  ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                  ? 'neu-btn-active'
+                  : 'neu-btn opacity-70 hover:opacity-100'
               }`}
             >
               <FileText className="w-3.5 h-3.5" />
@@ -623,10 +615,10 @@ CONFORMATION & STEREOCENTER SUMMARY:
             </button>
             <button
               onClick={() => setActiveTab('newman')}
-              className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 ${
+              className={`px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 ${
                 activeTab === 'newman'
-                  ? 'bg-purple-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                  ? 'neu-btn-active'
+                  : 'neu-btn opacity-70 hover:opacity-100'
               }`}
             >
               <Compass className="w-3.5 h-3.5" />
@@ -634,10 +626,10 @@ CONFORMATION & STEREOCENTER SUMMARY:
             </button>
             <button
               onClick={() => setActiveTab('chair-boat')}
-              className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 ${
+              className={`px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 ${
                 activeTab === 'chair-boat'
-                  ? 'bg-pink-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                  ? 'neu-btn-active'
+                  : 'neu-btn opacity-70 hover:opacity-100'
               }`}
             >
               <Layers className="w-3.5 h-3.5" />
@@ -645,10 +637,10 @@ CONFORMATION & STEREOCENTER SUMMARY:
             </button>
             <button
               onClick={() => setActiveTab('fischer')}
-              className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 ${
+              className={`px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 ${
                 activeTab === 'fischer'
-                  ? 'bg-amber-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                  ? 'neu-btn-active'
+                  : 'neu-btn opacity-70 hover:opacity-100'
               }`}
             >
               <span className="text-xs font-bold">✝</span>
@@ -656,10 +648,10 @@ CONFORMATION & STEREOCENTER SUMMARY:
             </button>
             <button
               onClick={() => setActiveTab('guide')}
-              className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 ${
+              className={`px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 ${
                 activeTab === 'guide'
-                  ? 'bg-teal-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                  ? 'neu-btn-active'
+                  : 'neu-btn opacity-70 hover:opacity-100'
               }`}
             >
               <BookOpen className="w-3.5 h-3.5" />
@@ -671,10 +663,10 @@ CONFORMATION & STEREOCENTER SUMMARY:
           <div className="flex items-center gap-1.5 shrink-0">
             <button
               onClick={handleCopyLabData}
-              className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 border ${
+              className={`px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 neu-btn ${
                 copiedText
-                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/50'
-                  : 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10'
+                  ? 'neu-btn-active text-emerald-400'
+                  : 'text-slate-300'
               }`}
               title="Copy complete lab notebook analysis report"
             >

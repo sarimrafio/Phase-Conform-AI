@@ -1,20 +1,150 @@
 @import "tailwindcss";
 
 :root {
-  --theme-bg-root: radial-gradient(ellipse at top, #2a2a35, #1e1e2f, #141423);
-  --theme-panel-bg: rgba(42, 42, 53, 0.45);
-  --theme-sub-bg: rgba(20, 20, 35, 0.85);
-  --theme-card-bg: rgba(30, 30, 47, 0.7);
-  --theme-border-color: rgba(165, 180, 252, 0.15);
-  --theme-text-main: #e0e7ff;
-  --theme-text-sub: #c7d2fe;
-  --theme-text-muted: #818cf8;
+  --theme-bg-root: radial-gradient(ellipse at top, #252533, #1c1c28, #14141e);
+  --theme-panel-bg: #20202d;
+  --theme-sub-bg: #181822;
+  --theme-card-bg: #242433;
+  --theme-border-color: rgba(255, 255, 255, 0.08);
+  --theme-text-main: #f1f5f9;
+  --theme-text-sub: #cbd5e1;
+  --theme-text-muted: #94a3b8;
   --theme-accent-primary: #ec4899;
   --theme-accent-secondary: #8b5cf6;
-  --theme-canvas-bg: #141423;
+  --theme-canvas-bg: #151520;
   --theme-canvas-grid: rgba(165, 180, 252, 0.05);
+
+  /* Neumorphic Dual Shadow Tokens (Configured dynamically per theme) */
+  --neu-shadow-dark: rgba(0, 0, 0, 0.65);
+  --neu-shadow-light: rgba(255, 255, 255, 0.06);
+  --neu-border: rgba(255, 255, 255, 0.08);
+  --neu-accent-glow: rgba(236, 72, 153, 0.4);
 }
 
+/* ==========================================================================
+   NEUMORPHIC (SOFT UI) CORE DESIGN SYSTEM
+   ========================================================================== */
+
+/* Extruded Surfaces (Raised from background) */
+.neu-raised {
+  background-color: var(--theme-panel-bg);
+  box-shadow: 7px 7px 18px var(--neu-shadow-dark), -7px -7px 18px var(--neu-shadow-light) !important;
+  border: 1px solid var(--neu-border) !important;
+}
+
+.neu-raised-sm {
+  background-color: var(--theme-card-bg);
+  box-shadow: 3px 3px 8px var(--neu-shadow-dark), -3px -3px 8px var(--neu-shadow-light) !important;
+  border: 1px solid var(--neu-border) !important;
+}
+
+.neu-raised-lg {
+  background-color: var(--theme-panel-bg);
+  box-shadow: 12px 12px 28px var(--neu-shadow-dark), -12px -12px 28px var(--neu-shadow-light) !important;
+  border: 1px solid var(--neu-border) !important;
+}
+
+/* Sunken / Recessed Surfaces (Punched into background) */
+.neu-inset, .neu-well {
+  background-color: var(--theme-sub-bg);
+  box-shadow: inset 4px 4px 8px var(--neu-shadow-dark), inset -4px -4px 8px var(--neu-shadow-light) !important;
+  border: 1px solid var(--neu-border) !important;
+}
+
+.neu-inset-sm {
+  background-color: var(--theme-sub-bg);
+  box-shadow: inset 2px 2px 5px var(--neu-shadow-dark), inset -2px -2px 5px var(--neu-shadow-light) !important;
+  border: 1px solid var(--neu-border) !important;
+}
+
+/* Tactile Neumorphic Buttons */
+.neu-btn {
+  background-color: var(--theme-card-bg);
+  box-shadow: 4px 4px 10px var(--neu-shadow-dark), -4px -4px 10px var(--neu-shadow-light) !important;
+  border: 1px solid var(--neu-border) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--theme-text-main);
+}
+
+.neu-btn:hover:not(:disabled) {
+  box-shadow: 6px 6px 14px var(--neu-shadow-dark), -6px -6px 14px var(--neu-shadow-light) !important;
+  transform: translateY(-1px);
+}
+
+.neu-btn:active:not(:disabled), .neu-pressed {
+  box-shadow: inset 3px 3px 6px var(--neu-shadow-dark), inset -3px -3px 6px var(--neu-shadow-light) !important;
+  transform: translateY(1px) !important;
+}
+
+/* Active Pressed Neumorphic Button (e.g. Selected Mode, Active Preset) */
+.neu-btn-active {
+  background-color: var(--theme-sub-bg) !important;
+  box-shadow: inset 3px 3px 7px var(--neu-shadow-dark), inset -3px -3px 7px var(--neu-shadow-light), 0 0 14px var(--neu-accent-glow) !important;
+  border: 1px solid var(--theme-accent-primary) !important;
+  color: var(--theme-accent-primary) !important;
+  transform: translateY(1px);
+}
+
+/* Rounded Tactile Pills */
+.neu-pill {
+  border-radius: 9999px;
+  background-color: var(--theme-card-bg);
+  box-shadow: 3px 3px 8px var(--neu-shadow-dark), -3px -3px 8px var(--neu-shadow-light) !important;
+  border: 1px solid var(--neu-border) !important;
+}
+
+.neu-pill-inset {
+  border-radius: 9999px;
+  background-color: var(--theme-sub-bg);
+  box-shadow: inset 2px 2px 5px var(--neu-shadow-dark), inset -2px -2px 5px var(--neu-shadow-light) !important;
+  border: 1px solid var(--neu-border) !important;
+}
+
+/* Tactile Range Slider Track and Thumb */
+input[type="range"].neu-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--theme-sub-bg) !important;
+  box-shadow: inset 3px 3px 6px var(--neu-shadow-dark), inset -3px -3px 6px var(--neu-shadow-light) !important;
+  border: 1px solid var(--neu-border) !important;
+  height: 12px;
+  border-radius: 9999px;
+  outline: none;
+}
+
+input[type="range"].neu-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--theme-card-bg);
+  box-shadow: 4px 4px 9px var(--neu-shadow-dark), -4px -4px 9px var(--neu-shadow-light), 0 0 10px var(--neu-accent-glow);
+  border: 2px solid var(--theme-accent-primary);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+input[type="range"].neu-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 5px 5px 12px var(--neu-shadow-dark), -5px -5px 12px var(--neu-shadow-light), 0 0 15px var(--neu-accent-glow);
+}
+
+input[type="range"].neu-slider::-webkit-slider-thumb:active {
+  box-shadow: inset 2px 2px 5px var(--neu-shadow-dark), inset -2px -2px 5px var(--neu-shadow-light), 0 0 16px var(--neu-accent-glow);
+}
+
+input[type="range"].neu-slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--theme-card-bg);
+  box-shadow: 4px 4px 9px var(--neu-shadow-dark), -4px -4px 9px var(--neu-shadow-light), 0 0 10px var(--neu-accent-glow);
+  border: 2px solid var(--theme-accent-primary);
+  cursor: pointer;
+}
+
+/* Theme Integration Classes */
 .theme-root {
   background: var(--theme-bg-root) !important;
   color: var(--theme-text-main) !important;
@@ -22,20 +152,23 @@
 
 .theme-panel {
   background-color: var(--theme-panel-bg) !important;
-  border-color: var(--theme-border-color) !important;
+  border: 1px solid var(--neu-border) !important;
   color: var(--theme-text-main) !important;
+  box-shadow: 7px 7px 18px var(--neu-shadow-dark), -7px -7px 18px var(--neu-shadow-light) !important;
 }
 
 .theme-sub {
   background-color: var(--theme-sub-bg) !important;
-  border-color: var(--theme-border-color) !important;
+  border: 1px solid var(--neu-border) !important;
   color: var(--theme-text-main) !important;
+  box-shadow: inset 3px 3px 7px var(--neu-shadow-dark), inset -3px -3px 7px var(--neu-shadow-light) !important;
 }
 
 .theme-card {
   background-color: var(--theme-card-bg) !important;
-  border-color: var(--theme-border-color) !important;
+  border: 1px solid var(--neu-border) !important;
   color: var(--theme-text-main) !important;
+  box-shadow: 4px 4px 10px var(--neu-shadow-dark), -4px -4px 10px var(--neu-shadow-light) !important;
 }
 
 .theme-text-main {
@@ -51,7 +184,7 @@
 }
 
 .theme-border {
-  border-color: var(--theme-border-color) !important;
+  border-color: var(--neu-border) !important;
 }
 
 .theme-accent {
@@ -60,27 +193,34 @@
 
 .theme-chip {
   background-color: var(--theme-sub-bg) !important;
-  border: 1px solid var(--theme-border-color) !important;
+  box-shadow: inset 2px 2px 5px var(--neu-shadow-dark), inset -2px -2px 5px var(--neu-shadow-light) !important;
+  border: 1px solid var(--neu-border) !important;
   color: var(--theme-text-main) !important;
 }
 
 .theme-card-subtle {
   background-color: var(--theme-card-bg) !important;
-  border: 1px solid var(--theme-border-color) !important;
+  box-shadow: 3px 3px 7px var(--neu-shadow-dark), -3px -3px 7px var(--neu-shadow-light) !important;
+  border: 1px solid var(--neu-border) !important;
   color: var(--theme-text-main) !important;
 }
 
+/* Custom Neumorphic Scrollbars */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--theme-sub-bg);
+  box-shadow: inset 1px 1px 3px var(--neu-shadow-dark), inset -1px -1px 3px var(--neu-shadow-light);
+  border-radius: 9999px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: var(--theme-border-color);
+  background: var(--theme-card-bg);
+  box-shadow: 1px 1px 3px var(--neu-shadow-dark), -1px -1px 3px var(--neu-shadow-light);
+  border: 1px solid var(--neu-border);
   border-radius: 9999px;
 }
 
@@ -112,4 +252,3 @@ button, input, select {
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
 }
-
